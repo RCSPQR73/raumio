@@ -4,6 +4,13 @@ Zweisprachige Landingpage und interaktive Raumscanner-Konzeptdemo. English ist d
 
 Die gemeinsame Produktbeschreibung, aktuelle Grenzen, Kernbotschaft und Roadmap stehen in [`MASTER_BRIEF.md`](MASTER_BRIEF.md).
 
+## Live ansehen und gemeinsam bearbeiten
+
+Das Projekt ist öffentlich auf GitHub verfügbar: <https://github.com/RCSPQR73/raumio>.
+Die veröffentlichte Website wird über GitHub Pages aus dem `main`-Branch bereitgestellt. Nach einem akzeptierten Push oder Merge baut der Pages-Workflow den aktuellen Stand automatisch aus `dist/`.
+
+Ein Link allein gibt keine Schreibrechte. Für direkte Änderungen muss eine Person als Repository-Mitwirkende mit Schreibzugriff eingeladen werden. Alternativ kann jede Person das Repository forken, Änderungen vorschlagen und einen Pull Request öffnen. Erst nach dem Merge in `main` wird der Stand veröffentlicht.
+
 ## Starten
 
 Im Projektordner: `python3 -m http.server 4173 --directory dist --bind 127.0.0.1`
