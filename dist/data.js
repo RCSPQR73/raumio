@@ -10,8 +10,9 @@ export const objects = [
 for(const o of objects){
  o.comparables=comparisons[o.id]??[];
  if(['bed','nightstand','lamp'].includes(o.id)){
-   o.min=Math.min(...o.comparables.map(c=>c.price));o.max=Math.max(...o.comparables.map(c=>c.price));
-   o.method='Min–Max der verlinkten gebrauchten Vergleichsangebote, jeweils pro Stück. Kleine Stichprobe und geringe Vergleichssicherheit; keine statistische Marktwertschätzung.';
+   const ranged=o.comparables.filter(c=>c.useInRange!==false);
+   o.min=Math.min(...ranged.map(c=>c.price));o.max=Math.max(...ranged.map(c=>c.price));
+   o.method=`Min–Max aus ${ranged.length} verlinkten gebrauchten Vergleichsangeboten, jeweils pro Stück. Die Stichprobe ist erweitert, aber nicht repräsentativ; es handelt sich um Angebotspreise und keine statistische Marktwertschätzung.`;
    if(o.id==='bed')o.method+=' Beide Vergleichsangebote ohne Matratze. Bettwäsche und Matratzen des Modellraums sind nicht bewertet.';
  }else if(o.id==='ottoman')o.method='Nur ein grob ähnliches Vergleichsangebot. Daraus wird keine Preisspanne berechnet; der Ottoman bleibt außerhalb der bewerteten Teilsumme.';
  else if(o.id==='chair')o.method='Zwei allgemeine Stuhlvergleiche zur Orientierung. Die visuelle Übereinstimmung zum Modell ist unzureichend bestätigt; deshalb bleibt der Stuhl unbewertet.';
