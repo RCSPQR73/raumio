@@ -16,3 +16,12 @@
 ## Begrenzte Nachweise
 
 Kein physisches iPhone/iPad, keine echte Kameraaufnahme und kein nativer Raumscan getestet. Kein tatsächlicher Verkauf, Kauf oder Verkäuferkontakt. Anzeigenverfügbarkeit nur anhand der beim Recherchezeitpunkt dargestellten Seiten; sie kann später ändern. Die Preisbasis ist begrenzt visuell vergleichbar, keine Bestätigung identischer Produkte. Das zusätzliche Möbelmodell wurde noch nicht bereitgestellt.
+
+## Prüfung nach der Gestaltungsüberarbeitung
+
+- Neue dunkle Hero-/Viewer-Fläche, helle Inhaltskapitel und separate Möbelbildwelt bei 1440 px Desktopbreite visuell geprüft.
+- Mobile Ansicht bei 390 × 844 px: Headline vollständig innerhalb ihrer Spalte, kein horizontaler Seitenüberlauf; 3D-Viewer bleibt früh sichtbar.
+- Möbelillustration geladen und visuell geprüft; ausdrücklich als KI-generierte Inspiration beschriftet.
+- Aufklappbare Funktionsdetails, Quellen-Dialog und Blickwechsel nach der Überarbeitung bedient.
+- Separate Möbel-Demo auf Mobilbreite: Inhaltshöhe und Containerhöhe stimmen überein (854 px), kein Abschneiden.
+- Bestehende vier Vertragstests erneut bestanden; keine Anwendungsfehler im Browserprotokoll bei der Design-Abnahme.

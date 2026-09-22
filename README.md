@@ -32,7 +32,9 @@ Die zusätzliche Möbeldatei fehlt noch. Sie kann anschließend in `dist/placeme
 ## Dateien
 
 - `dist/index.html`: Landingpage, Funktionsbeschreibungen, FAQ und Dialogstruktur.
-- `dist/styles.css`: Gestaltung und mobile Layouts.
+- `dist/styles.css`: Basis- und Interaktionslayouts.
+- `dist/design.css`: überarbeitete Markenwelt mit dunklem Einstieg und hellen redaktionellen Abschnitten.
+- `dist/assets/lounge-editorial.jpg`: KI-generierte, explizit illustrative Einrichtungsinspiration.
 - `dist/app.js`: gemeinsamer UI-Zustand, Quellen, Übersicht, Scan-Simulation, WebMCP.
 - `dist/camera.js`: kalibrierte Kamera und Strahlprüfung.
 - `dist/data.js`: Objektgruppen, Mesh-Zuordnung, Stückzahlen und Berechnung.
@@ -53,3 +55,7 @@ Browser-Abnahme: Preisquelle öffnen; bestätigte/wahrscheinliche/offene Kategor
 3D-Modell: [Hotel Room + Hallway](https://sketchfab.com/3d-models/hotel-room-hallway-f5d2584af20c4c778e22544c1c1334c6), [Rafael Rodrigues](https://sketchfab.com/RafaelBR873D). Originalmodell bleibt extern eingebettet. Quellenhinweis im Seitenfuß und native Sketchfab-Kennzeichnung bleiben erhalten. Das Modell wird nicht als eigenes Werk ausgegeben.
 
 Sketchfab Viewer API 1.12.1 vom offiziellen Anbieter; Three.js 0.180.0 (MIT, Lizenz in `dist/vendor/LICENSE`). Schriftarten werden von Google Fonts geladen. Anzeigen/Produktsuche führen zu Kleinanzeigen beziehungsweise IKEA. Keine Benutzerkonten, Formulardaten, API-Schlüssel oder Affiliate-IDs erforderlich.
+
+## Gestaltungsüberarbeitung
+
+Dunkler immersiver Hero und Viewer, kontrastierende helle Inhaltskapitel, großzügige Typografie, konsistente Bedienelemente und eine eigene Möbelillustration. Ergänzende Funktionsinformationen sind aufklappbar. Die Illustration zeigt kein verifiziertes Handelsprodukt und ersetzt nicht das später gelieferte Möbelmodell.
