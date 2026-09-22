@@ -6,6 +6,7 @@ export function initializeCamera(objects,onFocus,onStatus){
  const surface=document.createElement('div');surface.id='look-surface';surface.tabIndex=0;surface.role='application';surface.setAttribute('aria-label','360-Grad-Blicksteuerung. Nach oben ziehen blickt nach oben; der Standpunkt bleibt fixiert.');surface.innerHTML='<span class="reticle" aria-hidden="true"></span>';viewer.append(surface);
  const marker=document.createElement('div');marker.id='target-marker';marker.setAttribute('aria-hidden','true');marker.textContent='+';marker.hidden=true;viewer.append(marker);
  const controls=document.createElement('div');controls.className='look-controls';controls.innerHTML='<button id="look-left" aria-label="Blick nach links drehen">←</button><span id="look-heading">360°</span><button id="look-right" aria-label="Blick nach rechts drehen">→</button><button id="look-reset" aria-label="Blick zum Bett zurücksetzen">↺</button>';viewer.append(controls);
+ controls.querySelector('#look-heading').insertAdjacentHTML('beforebegin','<span class="control-label">BLICK</span>');
  let api=null,yaw=2.05,pitch=-.28,frame=0,active=true,drag=null,pickSequence=0,pickTimer=null,lastId=undefined,locked=false,requestCount=0;
  let pendingFocus=0;
  const focusWaiters=new Set();

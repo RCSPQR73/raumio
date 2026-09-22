@@ -5,8 +5,8 @@ import {objects,total} from '../dist/data.js';
 import {FIXED_EYE,directionFor} from '../dist/camera.js';
 test('price totals count quantities and exclude unsupported categories',()=>{
  const valued=objects.filter(o=>o.min!==null);
- assert.equal(valued.length,3);
- assert.equal(total(objects).count,4);
+ assert.equal(valued.length,5);
+ assert.equal(total(objects).count,6);
  for(const o of valued){assert.equal(o.min,Math.min(...o.comparables.map(c=>c.price)));assert.equal(o.max,Math.max(...o.comparables.map(c=>c.price)));}
  const expected=valued.reduce((a,o)=>({min:a.min+o.min*o.quantity,max:a.max+o.max*o.quantity}),{min:0,max:0});
  assert.equal(total(objects).min,expected.min);assert.equal(total(objects).max,expected.max);

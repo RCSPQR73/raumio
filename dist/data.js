@@ -17,6 +17,12 @@ for(const o of objects){
  }else if(o.id==='ottoman')o.method='Nur ein grob ähnliches Vergleichsangebot. Daraus wird keine Preisspanne berechnet; der Ottoman bleibt außerhalb der bewerteten Teilsumme.';
  else if(o.id==='chair')o.method='Zwei allgemeine Stuhlvergleiche zur Orientierung. Die visuelle Übereinstimmung zum Modell ist unzureichend bestätigt; deshalb bleibt der Stuhl unbewertet.';
 }
+for(const o of objects.filter(o=>o.id==='chair'||o.id==='ottoman')){
+ const ranged=o.comparables.filter(c=>c.useInRange!==false);
+ o.min=Math.min(...ranged.map(c=>c.price));o.max=Math.max(...ranged.map(c=>c.price));o.platform='Kleinanzeigen';
+ o.method=`Orientierungsspanne aus ${ranged.length} ähnlichen Kleinanzeigen-Angeboten. Die Möbelkategorie ist nur wahrscheinlich zugeordnet; Form, Maße, Zustand und Hersteller können abweichen.`;
+ o.reason=o.id==='chair'?'Wahrscheinlicher Polsterstuhl am Schreibtisch. Vergleichspreise dienen nur als grobe Orientierung; die konkrete Identität bleibt offen.':'Wahrscheinliche Polsterbank beziehungsweise Ottoman am Bettende. Vergleichspreise dienen nur als grobe Orientierung; Maße und Konstruktion bleiben offen.';
+}
 export const euro = n => new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
 export const price = o => o.min === null ? 'Noch offen' : `${o.min}–${o.max} €`;
 export const stateLabel = o => o.state === 'safe' ? 'Kategorie bestätigt' : o.state === 'probable' ? 'Wahrscheinlich' : 'Identität offen';
