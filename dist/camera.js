@@ -1,0 +1,27 @@
+// Calibrated for the supplied Hotel Room + Hallway asset. Sketchfab uses Z up.
+export const FIXED_EYE=Object.freeze([-10.25,14.25,1.62]);
+export function directionFor(yaw,pitch){return[Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)];}
+export function initializeCamera(objects,onFocus,onStatus){
+ const iframe=document.querySelector('#sketchfab'),viewer=document.querySelector('#viewer');
+ const surface=document.createElement('div');surface.id='look-surface';surface.tabIndex=0;surface.role='application';surface.setAttribute('aria-label','360-Grad-Blicksteuerung. Ziehen oder Pfeiltasten drehen den Blick vom festen Standpunkt.');surface.innerHTML='<span class="reticle" aria-hidden="true"></span>';viewer.append(surface);
+ const controls=document.createElement('div');controls.className='look-controls';controls.innerHTML='<button id="look-left" aria-label="Blick nach links drehen">←</button><span id="look-heading">360°</span><button id="look-right" aria-label="Blick nach rechts drehen">→</button><button id="look-reset" aria-label="Blick zum Bett zurücksetzen">↺</button>';viewer.append(controls);
+ let api=null,yaw=2.05,pitch=-.28,frame=0,active=true,drag=null,pickSequence=0,pickTimer=null,lastId=undefined,locked=false,requestCount=0;
+ let pendingFocus=0;
+ const focusWaiters=new Set();
+ const nodeIds=new Map();for(const o of objects)for(const id of o.nodes??[])nodeIds.set(id,o.id);
+ function emit(id){if(id!==lastId){lastId=id;onFocus(id);for(const done of focusWaiters)done(id);focusWaiters.clear();}}
+ function pick(){if(!api||!active||document.hidden||locked)return;const sequence=++pickSequence;const direction=directionFor(yaw,pitch);const end=FIXED_EYE.map((v,i)=>v+direction[i]*60);api.pickFromScene([...FIXED_EYE],end,(err,hit)=>{if(sequence!==pickSequence||!active)return;if(err){emit(null);return;}const id=hit?.instanceID;emit(nodeIds.get(id)??null);});}
+ function update(){if(!api||!active)return;const dir=directionFor(yaw,pitch),target=FIXED_EYE.map((v,i)=>v+dir[i]*10);api.setCameraLookAt([...FIXED_EYE],target,0);document.querySelector('#look-heading').textContent=`${Math.round(((yaw*180/Math.PI)%360+360)%360)}°`;viewer.dataset.cameraPosition=FIXED_EYE.join(',');viewer.dataset.cameraTarget=target.join(',');requestCount++;viewer.dataset.cameraUpdates=String(requestCount);pickSequence++;}
+ function queue(){cancelAnimationFrame(frame);frame=requestAnimationFrame(update);}
+ function turn(dx,dy=0){yaw+=dx;pitch=Math.max(-1.15,Math.min(1.05,pitch+dy));queue();}
+ function focus(index){const anchor=objects[index]?.anchor;if(!anchor)return false;pendingFocus=index;lastId=undefined;const d=anchor.map((v,i)=>v-FIXED_EYE[i]);yaw=Math.atan2(d[1],d[0]);pitch=Math.atan2(d[2],Math.hypot(d[0],d[1]));queue();return true;}
+ surface.addEventListener('pointerdown',e=>{if(!api)return;drag={x:e.clientX,y:e.clientY};surface.setPointerCapture(e.pointerId);surface.classList.add('dragging');surface.focus({preventScroll:true});});surface.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};turn(-dx*.004,dy*.003);});for(const event of ['pointerup','pointercancel','lostpointercapture'])surface.addEventListener(event,()=>{drag=null;surface.classList.remove('dragging');});surface.addEventListener('keydown',e=>{const keys={ArrowLeft:[.13,0],ArrowRight:[-.13,0],ArrowUp:[0,.1],ArrowDown:[0,-.1]};if(keys[e.key]){e.preventDefault();turn(...keys[e.key]);}if(e.key==='Home'){e.preventDefault();focus(0);}});
+ controls.querySelector('#look-left').addEventListener('click',()=>turn(.3));controls.querySelector('#look-right').addEventListener('click',()=>turn(-.3));controls.querySelector('#look-reset').addEventListener('click',()=>focus(0));
+ const watchdog=setTimeout(()=>{if(!api)onStatus('slow');},20000);const sdk=document.createElement('script');sdk.src='vendor/sketchfab-viewer-1.12.1.js';sdk.onload=()=>{
+ const client=new window.Sketchfab('1.12.1',iframe);client.init('f5d2584af20c4c778e22544c1c1334c6',{autostart:1,dnt:1,scrollwheel:0,camera:0,success(instance){instance.start();instance.addEventListener('viewerready',()=>{clearTimeout(watchdog);api=instance;api.setUserInteraction(false);api.getAnnotationList((err,annotations)=>{if(!err)annotations.forEach((_,index)=>api.hideAnnotation(index));});focus(pendingFocus);update();onStatus('ready');pickTimer=setInterval(pick,140);
+ // Keep the fixed eye even if a native control tries to restore the model's saved camera.
+ api.addEventListener('camerastop',()=>{if(!active)return;api.getCameraLookAt((err,view)=>{if(!err){viewer.dataset.cameraObservedPosition=view.position.join(',');viewer.dataset.cameraObservedTarget=view.target.join(',');}if(!err&&view.position.some((v,i)=>Math.abs(v-FIXED_EYE[i])>.001))queue();});});
+ });},error(){clearTimeout(watchdog);onStatus('error');}});
+ };sdk.onerror=()=>{clearTimeout(watchdog);onStatus('error');};document.head.append(sdk);
+ return{focus,focusAndWait(index){if(!api)return Promise.reject(new Error('Der 3D-Raum lädt noch. Bitte erneut versuchen, sobald er bereit ist.'));return new Promise(resolve=>{const done=id=>{clearTimeout(timeout);resolve(id);};const timeout=setTimeout(()=>{focusWaiters.delete(done);resolve(lastId??null);},2500);focusWaiters.add(done);focus(index);});},setActive(value){active=value;surface.hidden=!value;controls.hidden=!value;if(value){queue();pick();}else{pickSequence++;}},setLocked(value){locked=value;},dispose(){clearTimeout(watchdog);clearInterval(pickTimer);cancelAnimationFrame(frame);}};
+}
