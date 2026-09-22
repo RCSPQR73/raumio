@@ -7,7 +7,7 @@ Die gemeinsame Produktbeschreibung, aktuelle Grenzen, Kernbotschaft und Roadmap 
 ## Live ansehen und gemeinsam bearbeiten
 
 Das Projekt ist öffentlich auf GitHub verfügbar: <https://github.com/RCSPQR73/raumio>.
-Die veröffentlichte Website wird über GitHub Pages aus dem `main`-Branch bereitgestellt. Nach einem akzeptierten Push oder Merge baut der Pages-Workflow den aktuellen Stand automatisch aus `dist/`.
+Ein GitHub-Pages-Workflow ist eingerichtet und veröffentlicht den aktuellen Stand aus `dist/` nach jedem akzeptierten Push oder Merge. Einmalig muss unter **Settings → Pages** als Quelle **GitHub Actions** ausgewählt werden; danach ist die Website unter `https://rcspqr73.github.io/raumio/` erreichbar.
 
 Ein Link allein gibt keine Schreibrechte. Für direkte Änderungen muss eine Person als Repository-Mitwirkende mit Schreibzugriff eingeladen werden. Alternativ kann jede Person das Repository forken, Änderungen vorschlagen und einen Pull Request öffnen. Erst nach dem Merge in `main` wird der Stand veröffentlicht.
 
