@@ -1,6 +1,8 @@
 # RAUMIO
 
-Vollständige deutschsprachige Landingpage und interaktive Raumscanner-Konzeptdemo.
+Zweisprachige Landingpage und interaktive Raumscanner-Konzeptdemo. English ist die Standardsprache; Deutsch kann über den Sprachumschalter aktiviert werden.
+
+Die gemeinsame Produktbeschreibung, aktuelle Grenzen, Kernbotschaft und Roadmap stehen in [`MASTER_BRIEF.md`](MASTER_BRIEF.md).
 
 ## Starten
 
