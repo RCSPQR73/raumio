@@ -26,7 +26,7 @@ Dann `http://127.0.0.1:4173` öffnen. Keine Installation und kein Build erforder
 - Neun individuell recherchierte Kleinanzeigen-Angebote, einschließlich Datenstand, Preis, Einheit und Ähnlichkeitsgrenzen. Nur drei Kategorien mit jeweils zwei Vergleichspreisen fließen in die Teilsumme ein. Zwei weitere Kategorien zeigen Recherchebelege, bleiben aber unbewertet.
 - Filterbare Übersicht, Quellen-Dialog mit konkreten Anzeigen und transparenter Berechnung, Preis-An/Aus, direkter Blick auf ausgewählte Objekte.
 - Scan-Ablaufsimulation ohne Kameraaufnahme.
-- Separate Three.js-Platzierungsszene mit Sessel/Tisch, Position, Drehung, Farben, Reset, Ziehen und animiertem Ablauf; Produktsuche ohne Affiliate-ID.
+- Platzierungsansicht im selben Explore-Raum: lokale Referenzaufnahme des Hotelzimmers plus transparenter Three.js-Möbel-Overlay mit Position, Drehung, Farben, Reset, Ziehen und animiertem Ablauf; Produktsuche ohne Affiliate-ID.
 - Ausführliche Funktionsbeschreibungen und FAQ, responsive Gestaltung, Tastaturbedienung und reduzierte Bewegung für Oberflächenübergänge.
 - Optional WebMCP: `read_room_demo` und `focus_room_object`, mit derselben UI-Zustandslogik.
 
@@ -36,7 +36,7 @@ Kein tatsächlicher Raumscan, keine automatische KI-Erkennung, keine Live-Preiss
 
 Stand 22.09.2026: Bettrahmen 70–180 € je Stück (Vergleichsangebote ohne Matratze), Nachttisch 10–20 €, gebrauchte Tischleuchte 6–10 €. Bewertete Teilsumme: **156–390 €** für zwei Bettrahmen, einen Nachttisch und eine Leuchte. Der vollständige Raumwert bleibt offen. Weitere sichtbare Objekte außerhalb der Liste sind nicht bewertet. Die Beispiele sind nur begrenzt visuell vergleichbar; Abweichungen stehen bei jeder Quelle. Anzeigen waren bei Prüfung erreichbar; Verkäufer wurden nicht kontaktiert.
 
-Die zusätzliche Möbeldatei fehlt noch. Sie kann anschließend in `dist/placement.js` anstelle der erzeugten Beispielgeometrie integriert werden. Dafür sind Dateiformat, Maßstab, Ausrichtung und Material zu prüfen. Das fremde Sketchfab-Modell stellt keinen beliebigen GLB-Import bereit und ist nicht als Download freigegeben. Eine exakte gemeinsame Platzierung in dessen Originalgeometrie benötigt eine nutzbare Raumdatei samt Nutzungsrechten.
+Die zusätzliche Möbeldatei fehlt noch. Sie kann anschließend in `dist/placement.js` anstelle der erzeugten Beispielgeometrie integriert werden. Dafür sind Dateiformat, Maßstab, Ausrichtung und Material zu prüfen. Das fremde Sketchfab-Modell stellt keinen beliebigen GLB-Import bereit und ist nicht als Download freigegeben. Die aktuelle Demo nutzt deshalb eine lokale Referenzaufnahme desselben Raums und legt die Möbel interaktiv als Overlay darüber; eine exakte gemeinsame Platzierung in der Originalgeometrie benötigt weiterhin eine nutzbare Raumdatei samt Nutzungsrechten.
 
 ## Dateien
 
@@ -48,7 +48,7 @@ Die zusätzliche Möbeldatei fehlt noch. Sie kann anschließend in `dist/placeme
 - `dist/camera.js`: kalibrierte Kamera und Strahlprüfung.
 - `dist/data.js`: Objektgruppen, Mesh-Zuordnung, Stückzahlen und Berechnung.
 - `dist/comparables.js`: konkrete, recherchierte Anzeigen und Vergleichsgrenzen.
-- `dist/placement.js`: separate interaktive 3D-Möbelszene.
+- `dist/placement.js`: interaktiver Möbel-Overlay über der Referenzaufnahme desselben Explore-Raums.
 - `tests/contract.test.mjs`: relevante Berechnungs- und Kamerainvarianten.
 
 ## Prüfen
@@ -61,7 +61,7 @@ Browser-Abnahme: Preisquelle öffnen; bestätigte/wahrscheinliche/offene Kategor
 
 ## Externe Dienste und Herkunft
 
-3D-Modell: [Hotel Room + Hallway](https://sketchfab.com/3d-models/hotel-room-hallway-f5d2584af20c4c778e22544c1c1334c6), [Rafael Rodrigues](https://sketchfab.com/RafaelBR873D). Originalmodell bleibt extern eingebettet. Quellenhinweis im Seitenfuß und native Sketchfab-Kennzeichnung bleiben erhalten. Das Modell wird nicht als eigenes Werk ausgegeben.
+3D-Modell: [Hotel Room + Hallway](https://sketchfab.com/3d-models/hotel-room-hallway-f5d2584af20c4c778e22544c1c1334c6), [Rafael Rodrigues](https://sketchfab.com/RafaelBR873D). Originalmodell bleibt extern eingebettet. Die lokale Referenzaufnahme dient nur der visuellen Konsistenz der Platzierungsdemo. Quellenhinweis im Seitenfuß und native Sketchfab-Kennzeichnung bleiben erhalten. Das Modell wird nicht als eigenes Werk ausgegeben.
 
 Sketchfab Viewer API 1.12.1 vom offiziellen Anbieter; Three.js 0.180.0 (MIT, Lizenz in `dist/vendor/LICENSE`). Schriftarten werden von Google Fonts geladen. Anzeigen/Produktsuche führen zu Kleinanzeigen beziehungsweise IKEA. Keine Benutzerkonten, Formulardaten, API-Schlüssel oder Affiliate-IDs erforderlich.
 
