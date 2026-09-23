@@ -15,7 +15,7 @@ export const OBSTACLES = [
 ];
 
 export const FOOTPRINTS = {
-  chair:{width:.78,depth:.82,height:.86},
+  chair:{width:.78,depth:.82,height:1.05},
   table:{width:.60,depth:.60,height:.45},
   pouf:{width:.52,depth:.52,height:.44}
 };

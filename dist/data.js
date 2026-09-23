@@ -1,5 +1,5 @@
-import {comparisons} from './comparables.js?v=20260923n';
-import {t} from './locale.js?v=20260923n';
+import {comparisons} from './comparables.js?v=20260923ag';
+import {t} from './locale.js?v=20260923ag';
 export const objects = [
  {id:'bed',name:'Polsterbetten',quantity:2,detail:'Zwei Betten · Gepolstertes Kopfteil',min:null,max:null,state:'safe',platform:'Kleinanzeigen',reason:'Kategorie im 3D-Modell bestätigt. Hersteller, Breite und Material sind nicht belegt.',query:'Polsterbett 90x200 grau',nodes:[3,4,5,22,23,24],anchor:[-11.9533,16.05,.65],icon:'bed',comparables:[]},
  {id:'nightstand',name:'Nachttisch',quantity:1,detail:'Holzoptik · Schubladen',min:null,max:null,state:'safe',platform:'Kleinanzeigen',reason:'Nachttisch im Modell eindeutig. Das Holz und der Hersteller sind nicht bestätigt.',query:'Nachttisch Holz Schubladen',nodes:[41,42,43],anchor:[-10.2533,16.831,.55],icon:'table',comparables:[]},
@@ -51,4 +51,4 @@ export const price = o => o.min === null ? t('valuationOpen') : `${o.min}–${o.
 export const stateLabel = o => o.state === 'safe' ? t('categorySafe') : o.state === 'probable' ? t('probable') : t('identityOpen');
 export const total = rows => rows.reduce((s,o)=>({min:s.min+(o.min!==null&&o.includeInTotal!==false?o.min*(o.quantity??1):0),max:s.max+(o.max!==null&&o.includeInTotal!==false?o.max*(o.quantity??1):0),count:s.count+(o.min!==null&&o.includeInTotal!==false?(o.quantity??1):0)}),{min:0,max:0,count:0});
 export const marketLink = o => o.platform === 'eBay' ? `https://www.ebay.de/sch/i.html?_nkw=${encodeURIComponent(o.query)}` : `https://www.kleinanzeigen.de/s-${encodeURIComponent(o.query.toLowerCase().replaceAll(' ','-'))}/k0`;
-export const furniture = {chair:{name:'Lounge 01',type:'Sessel',price:249,size:'78 × 82 × 86 cm',width:.78,depth:.82,height:.86},table:{name:'Circle 02',type:'Beistelltisch',price:89,size:'60 × 60 × 45 cm',width:.6,depth:.6,height:.45},pouf:{name:'Mellow 03',type:'Polsterhocker',price:129,size:'52 × 52 × 44 cm',width:.52,depth:.52,height:.44}};
+export const furniture = {chair:{name:'Lounge 01',type:'Sessel',price:249,size:'78 × 82 × 105 cm',width:.78,depth:.82,height:1.05},table:{name:'Circle 02',type:'Beistelltisch',price:89,size:'60 × 60 × 45 cm',width:.6,depth:.6,height:.45},pouf:{name:'Mellow 03',type:'Polsterhocker',price:129,size:'52 × 52 × 44 cm',width:.52,depth:.52,height:.44}};

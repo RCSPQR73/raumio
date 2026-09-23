@@ -25,7 +25,7 @@ test('nearest valid placement moves an invalid request into nearby free floor',(
   assert.ok(Math.hypot(result.x,result.z-.9)<1.1);
 });
 
-test('live hitbox validation samples the whole footprint and caches nearby rays',async()=>{
+test('live mesh-ray validation samples the whole footprint and caches nearby rays',async()=>{
   const cache=new Map();let calls=0,requestedHeight=0;
   const sample=async(x,y,height)=>{calls++;requestedHeight=height;const planX=x+10.2,planZ=14-y;return{floor:planX>-.7&&planX<.7&&planZ>-.7&&planZ<.7,clear:true};};
   assert.equal(await validateMeshPlacement(sample,'pouf',0,0,45,{cache}),true);
@@ -34,7 +34,7 @@ test('live hitbox validation samples the whole footprint and caches nearby rays'
   assert.equal((await validateMeshPlacement(sample,'chair',0,.55,0,{cache})).valid,false);
 });
 
-test('live hitbox validation rejects an elevated obstruction or an incomplete probe',async()=>{
+test('live mesh-ray validation rejects an elevated obstruction or an incomplete probe',async()=>{
   const blocked=async(x,y,height)=>{const planX=x+10.2,planZ=14-y,blockedBy=planX>-.35&&planX<.35&&planZ>-.35&&planZ<.35?'bed':null;return{floor:true,clear:!blockedBy,blockedBy,checkedHeight:height};};
   const result=await validateMeshPlacement(blocked,'table',0,0,0);
   assert.equal(result.valid,false,'a hit anywhere through the object height blocks placement');

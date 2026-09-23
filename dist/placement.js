@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
-import {furniture,objects,euro} from './data.js?v=20260923ae';
-import {t} from './locale.js?v=20260923ae';
-import {CLEARANCE,FOOTPRINTS,isValidPlacement,nearestValidPlacement,validateMeshPlacement} from './placement-geometry.mjs?v=20260923ae';
+import {furniture,objects,euro} from './data.js?v=20260923ag';
+import {t} from './locale.js?v=20260923ag';
+import {CLEARANCE,FOOTPRINTS,isValidPlacement,nearestValidPlacement,validateMeshPlacement} from './placement-geometry.mjs?v=20260923ag';
 
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const BASE={x:-10.2,y:14.0};
@@ -33,10 +33,10 @@ export function createPlacement(stage,controlsHost,notify){
  const fill=new THREE.DirectionalLight(0xd9ebdc,.85);fill.position.set(-8,12,-7);scene.add(fill);
  const camera=new THREE.PerspectiveCamera(60,1,.1,50);camera.up.set(0,1,0);camera.position.set(-10.2,13.1,6.4);camera.lookAt(-10.2,14.35,0);
  const object=new THREE.Group();scene.add(object);
- const cloth=new THREE.MeshStandardMaterial({color:'#c4b8a8',roughness:.92,metalness:0});
- const cushionCloth=new THREE.MeshStandardMaterial({color:'#dfd4c5',roughness:.96,metalness:0});
- const wood=new THREE.MeshStandardMaterial({color:'#704632',roughness:.42,metalness:0});
- const woodLight=new THREE.MeshStandardMaterial({color:'#956747',roughness:.44,metalness:0});
+ const cloth=new THREE.MeshStandardMaterial({color:'#b8ada1',roughness:.94,metalness:0});
+ const cushionCloth=new THREE.MeshStandardMaterial({color:'#e5dbcf',roughness:.98,metalness:0});
+ const wood=new THREE.MeshStandardMaterial({color:'#684b38',roughness:.62,metalness:0});
+ const woodLight=new THREE.MeshStandardMaterial({color:'#997354',roughness:.62,metalness:0});
  const metal=new THREE.MeshStandardMaterial({color:'#b28b57',roughness:.28,metalness:.72});
  const poufFabric=new THREE.MeshStandardMaterial({color:'#777e64',roughness:.97,metalness:0});
  const poufTop=new THREE.MeshStandardMaterial({color:'#8a9174',roughness:.97,metalness:0});
@@ -44,6 +44,17 @@ export function createPlacement(stage,controlsHost,notify){
  const poufWood=new THREE.MeshStandardMaterial({color:'#493629',roughness:.42,metalness:0});
  const shadowMaterial=new THREE.MeshBasicMaterial({color:'#17241d',transparent:true,opacity:.17,depthWrite:false});
  const shadow=new THREE.Mesh(new THREE.CircleGeometry(.52,48),shadowMaterial);shadow.position.z=.025;scene.add(shadow);
+ let materialDefaults=new Map();
+ const setObjectState=state=>{
+  for(const [material,original] of materialDefaults){
+   material.transparent=state!=='clear'||original.transparent;
+   material.opacity=state==='checking'?.66:state==='blocked'?.48:original.opacity;
+   material.depthWrite=state==='clear'?original.depthWrite:false;
+   if(material.emissive)material.emissive.set(state==='blocked'?'#a53327':state==='checking'?'#9a682e':original.emissive);
+   material.needsUpdate=true;
+  }
+  shadow.visible=state==='clear';
+ };
  const zoneGroup=new THREE.Group();scene.add(zoneGroup);
  const footprintGroup=new THREE.Group();scene.add(footprintGroup);let footprintFill,footprintOutline,footprintFillMaterial,footprintOutlineMaterial;
  const roundedPrism=(w,d,h,r,x,y,z,material)=>{
@@ -86,24 +97,26 @@ export function createPlacement(stage,controlsHost,notify){
   object.userData.detailMaterials=[stitchMaterial];shadow.scale.set(.72,.72,1);
  };
  const rebuild=()=>{
+  setObjectState('clear');
   for(const mesh of [...object.children]){object.remove(mesh);mesh.geometry?.dispose();}
   for(const material of object.userData.detailMaterials||[])material.dispose();object.userData.detailMaterials=[];
   object.scale.set(1,1,1);
   if(kind==='chair'){
-   // Scandinavian lounge chair: thick tailored cushions inside a warm walnut frame.
-   roundedPrism(.68,.61,.115,.09,0,-.015,.465,wood);
-   roundedPrism(.635,.59,.125,.11,0,-.045,.55,cushionCloth);
-   const back=roundedPrism(.64,.16,.59,.12,0,.245,.835,wood);back.rotation.x=Math.PI/2-.10;
-   const backPad=roundedPrism(.57,.115,.49,.105,0,.196,.86,cloth);backPad.rotation.x=Math.PI/2-.10;
-   // Tapered walnut legs and continuous arms create a recognizable, usable silhouette.
+   // The backrest is vertical in the Z-up model. The former X rotation laid its
+   // 59 cm height across the seat, which looked like a large wooden block above.
+   roundedPrism(.70,.66,.095,.09,0,-.075,.435,wood);
+   roundedPrism(.63,.54,.14,.13,0,-.105,.535,cushionCloth);
+   roundedPrism(.67,.105,.53,.035,0,.265,.765,wood);
+   roundedPrism(.58,.12,.42,.045,0,.206,.815,cloth);
+   // Padded armrests sit either side of the visible seat cushion.
    for(const x of [-.31,.31]){
     leg(x,-.245,.36,.027,wood);leg(x,.255,.43,.026,wood);
-    tube([[x,-.27,.65],[x,-.20,.68],[x,.03,.68],[x,.25,.72],[x,.31,.77]],.031,woodLight,24);
-    tube([[x,-.26,.39],[x,-.12,.41],[x,.16,.49],[x,.25,.61]],.026,wood,20);
+    roundedPrism(.105,.48,.095,.045,x,-.08,.64,cloth);
+    tube([[x,-.30,.67],[x,-.12,.70],[x,.13,.70],[x,.27,.75]],.018,woodLight,24);
+    tube([[x,-.27,.39],[x,-.12,.41],[x,.16,.49],[x,.25,.61]],.024,wood,20);
    }
-   tube([[-.31,.26,.73],[-.16,.26,.75],[0,.26,.76],[.16,.26,.75],[.31,.26,.73]],.023,wood,28);
-   // Fine upholstery piping and two restrained seams add scale and finish.
-   tube([[-.27,-.045,.618],[0,-.045,.619],[.27,-.045,.618]],.006,woodLight,20);
+   tube([[-.28,.205,1.015],[0,.205,1.015],[.28,.205,1.015]],.007,woodLight,20);
+   tube([[-.26,-.335,.605],[0,-.335,.605],[.26,-.335,.605]],.006,woodLight,20);
    shadow.scale.set(1.08,1.10,1);
   }else if(kind==='table'){
    // Sculpted oak-and-brass pedestal table, with a softly finished round top.
@@ -118,6 +131,7 @@ export function createPlacement(stage,controlsHost,notify){
    for(let i=0;i<3;i++){const a=i*Math.PI*2/3,x=Math.cos(a)*.19,y=Math.sin(a)*.19;leg(x,y,.115,.018,wood);}
    shadow.scale.set(.76,.76,1);
   }else{makePouf();object.scale.set(.78,.78,.85);}
+  materialDefaults=new Map();object.traverse(node=>{if(node.material)for(const material of [node.material].flat())if(!materialDefaults.has(material))materialDefaults.set(material,{transparent:material.transparent,opacity:material.opacity,depthWrite:material.depthWrite,emissive:material.emissive?.clone()});});
   controlsHost.querySelectorAll('[data-furniture]').forEach(button=>{const selected=button.dataset.furniture===kind;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected));});
   controlsHost.querySelector('.placement-demo-price').textContent=`${euro(furniture[kind].price)} · ${t('newPrice')}`;
   controlsHost.querySelector('.placement-demo-size').textContent=furniture[kind].size;
@@ -138,7 +152,7 @@ export function createPlacement(stage,controlsHost,notify){
   if(!meshRequired){const snapped=nearestValidPlacement(kind,requested.x,requested.z,rotation,lastValid);const x=snapped?.x??lastValid.x,z=snapped?.z??lastValid.z;controls.x.value=String(x);controls.z.value=String(z);applyPosition(x,z,rotation);const changed=Math.hypot(x-requested.x,z-requested.z)>.025;setFootprint(x,z,rotation,changed?'blocked':'clear');const status=controlsHost.querySelector('.placement-zone-label');status.textContent=changed?t('placementSnapped'):t('placementClearance');status.classList.toggle('is-adjusted',changed);status.classList.toggle('is-blocked',false);return;}
   clearTimeout(validationTimer);const sequence=++validationSequence;
   if(!meshProbe){object.visible=false;setFootprint(requested.x,requested.z,rotation,'unavailable');controlsHost.querySelector('.placement-zone-label').textContent=t('placementMeshUnavailable');return;}
-  setFootprint(requested.x,requested.z,rotation,'checking');
+  object.visible=true;applyPosition(requested.x,requested.z,rotation);setObjectState('checking');setFootprint(requested.x,requested.z,rotation,'checking');
   controlsHost.querySelector('.placement-zone-label').textContent=t('placementMeshChecking');
   controlsHost.querySelector('.placement-zone-label').classList.remove('is-adjusted');
   controlsHost.querySelector('.placement-zone-label').classList.remove('is-blocked');
@@ -149,8 +163,8 @@ export function createPlacement(stage,controlsHost,notify){
    if(sequence!==validationSequence||!active)return;
    const status=controlsHost.querySelector('.placement-zone-label');
    const isValid=result===true||result?.valid===true;
-   if(isValid){controls.x.value=String(requested.x);controls.z.value=String(requested.z);lastValid={x:requested.x,z:requested.z};lastVerifiedRotation=rotation;lastVerified=true;object.visible=true;applyPosition(requested.x,requested.z,rotation);setFootprint(requested.x,requested.z,rotation,'clear');status.textContent=t('placementClearance');status.classList.remove('is-adjusted','is-blocked');}
-   else{applyPosition(lastValid.x,lastValid.z,lastVerified?lastVerifiedRotation:rotation);object.visible=lastVerified;setFootprint(requested.x,requested.z,rotation,result===null?'unavailable':'blocked');const blockerIds=Array.isArray(result?.blockedBy)?result.blockedBy:[];const blockerNames=[...new Set(blockerIds.map(id=>objects.find(item=>item.id===id)?.name).filter(Boolean))].slice(0,2);const reason=result===null?t('placementMeshUnavailable'):blockerNames.length?t('placementBlockedBy').replace('{items}',blockerNames.join(' · ')):t('placementBlocked');status.textContent=result===null?reason:`${reason} · ${t('placementLastClear')}`;status.classList.toggle('is-adjusted',result===null);status.classList.toggle('is-blocked',result!==null);}
+   if(isValid){lastValid={x:requested.x,z:requested.z};lastVerifiedRotation=rotation;lastVerified=true;object.visible=true;setObjectState('clear');setFootprint(requested.x,requested.z,rotation,'clear');status.textContent=t('placementClearance');status.classList.remove('is-adjusted','is-blocked');render();}
+   else{const blockerIds=Array.isArray(result?.blockedBy)?result.blockedBy:[];const blockerNames=[...new Set(blockerIds.map(id=>objects.find(item=>item.id===id)?.name).filter(Boolean))].slice(0,2);const reason=result===null?t('placementMeshUnavailable'):blockerNames.length?t('placementBlockedBy').replace('{items}',blockerNames.join(' · ')):t('placementBlocked');status.textContent=reason;status.classList.toggle('is-adjusted',result===null);status.classList.toggle('is-blocked',result!==null);setObjectState(result===null?'checking':'blocked');setFootprint(requested.x,requested.z,rotation,result===null?'unavailable':'blocked');render();if(!drag){setTimeout(()=>{if(sequence!==validationSequence||!active)return;controls.x.value=String(lastValid.x);controls.z.value=String(lastValid.z);controls.rotation.value=String(lastVerifiedRotation);applyPosition(lastValid.x,lastValid.z,lastVerifiedRotation);object.visible=lastVerified;setObjectState('clear');setFootprint(lastValid.x,lastValid.z,lastVerifiedRotation,lastVerified?'clear':'unavailable');status.textContent=`${reason} · ${t('placementLastClear')}`;render();},650);}}
   },100);
  };
  const localize=()=>{
@@ -171,12 +185,12 @@ export function createPlacement(stage,controlsHost,notify){
   raf=requestAnimationFrame(tick);
  };
  Object.values(controls).forEach(input=>input.addEventListener('input',()=>{stop();update();}));
- controlsHost.querySelectorAll('[data-furniture]').forEach(button=>button.addEventListener('click',()=>{stop();kind=button.dataset.furniture;lastVerified=false;object.visible=false;setZone();controls.x.value='.01';controls.z.value='.01';controls.rotation.value='0';rebuild();update();}));
+ controlsHost.querySelectorAll('[data-furniture]').forEach(button=>button.addEventListener('click',()=>{stop();kind=button.dataset.furniture;lastValid={x:.01,z:.01};lastVerifiedRotation=0;lastVerified=false;object.visible=false;setZone();controls.x.value='.01';controls.z.value='.01';controls.rotation.value='0';rebuild();update();}));
  controlsHost.querySelector('#animate-furniture').addEventListener('click',play);
  controlsHost.querySelector('#reset-furniture').addEventListener('click',()=>{stop();controls.x.value='.01';controls.z.value='.01';controls.rotation.value='0';update();notify(t('resetDone'));});
  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2(),floor=new THREE.Plane(new THREE.Vector3(0,0,1),0),point=new THREE.Vector3();
  const pointAt=event=>{const rect=renderer.domElement.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.ray.intersectPlane(floor,point)?point.clone():null;};
- renderer.domElement.addEventListener('pointerdown',event=>{if(!active)return;const p=pointAt(event);if(!p)return;stop();drag={dx:object.position.x-p.x,dy:object.position.y-p.y};renderer.domElement.setPointerCapture(event.pointerId);renderer.domElement.classList.add('dragging');});
+ renderer.domElement.addEventListener('pointerdown',event=>{if(!active)return;const p=pointAt(event);if(!p)return;stop();const hits=object.visible?raycaster.intersectObject(object,true):[];drag=hits.length?{dx:object.position.x-p.x,dy:object.position.y-p.y}:{dx:0,dy:0};renderer.domElement.setPointerCapture(event.pointerId);renderer.domElement.classList.add('dragging');if(!hits.length){controls.x.value=String(clamp(p.x-BASE.x,...bounds.x));controls.z.value=String(clamp(BASE.y-p.y,...bounds.z));update();}});
  renderer.domElement.addEventListener('pointermove',event=>{if(!drag)return;const p=pointAt(event);if(!p)return;controls.x.value=String(clamp(p.x+drag.dx-BASE.x,...bounds.x));controls.z.value=String(clamp(BASE.y-(p.y+drag.dy),...bounds.z));update();});
  for(const event of ['pointerup','pointercancel','lostpointercapture'])renderer.domElement.addEventListener(event,()=>{const wasDragging=Boolean(drag);drag=null;renderer.domElement.classList.remove('dragging');if(wasDragging)update();});
  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();stop();notify(t('graphicsPaused'));});

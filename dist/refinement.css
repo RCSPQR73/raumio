@@ -803,3 +803,19 @@ body { background: var(--bg); color: var(--text); }
   #placement-controls .placement-zone-label { font-size: 13px; }
   .viewer:not(.placing) .object-card { width: auto; }
 }
+
+/* Furniture placement: keep the room visible and make the move affordance small. */
+.viewer.placing #placement-stage .placement-help {
+  left: auto; right: 16px; top: 16px; bottom: auto; transform: none;
+  width: auto; max-width: 230px; height: auto; min-height: 0;
+  padding: 9px 12px; text-align: left; justify-content: flex-start;
+  font-size: 11px; line-height: 1.35;
+}
+@media (max-width: 760px) {
+  .viewer.placing #placement-stage .placement-badge { display: none !important; }
+  .viewer.placing #placement-stage .placement-help {
+    left: 11px; right: auto; top: 11px; bottom: auto;
+    width: auto; max-width: calc(100% - 22px); height: auto;
+    padding: 8px 10px; font-size: 10px;
+  }
+}

@@ -1,5 +1,5 @@
 // Calibrated for the supplied Hotel Room + Hallway asset. Sketchfab uses Z up.
-import {t} from './locale.js?v=20260923n';
+import {t} from './locale.js?v=20260923ag';
 export const FIXED_EYE=Object.freeze([-10.25,14.25,1.62]);
 export function directionFor(yaw,pitch){return[Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)];}
 export function initializeCamera(objects,onFocus,onStatus){

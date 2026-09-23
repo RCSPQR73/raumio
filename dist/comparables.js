@@ -154,5 +154,16 @@ const expandedComparisons={
 };
 for(const [category,listings] of Object.entries(expandedComparisons)){
  comparisons[category]??=[];
- comparisons[category].push(...listings);
+ const existing=new Set(comparisons[category].map(listing=>listing.url));
+ for(const listing of listings)if(!existing.has(listing.url)){
+  comparisons[category].push(listing);
+  existing.add(listing.url);
+ }
+}
+for(const category of Object.keys(comparisons)){
+ const seen=new Set();
+ comparisons[category]=comparisons[category].filter(listing=>{
+  if(seen.has(listing.url))return false;
+  seen.add(listing.url);return true;
+ });
 }
