@@ -76,3 +76,18 @@ const more={
  vase:[{title:'Runde Vasen / Krüge Keramik in Grau und Braun',price:9,date:'20.02.2026',location:'Köln-Widdersdorf',url:'https://www.kleinanzeigen.de/s-anzeige/runde-vasen-kruege-keramik-versch-groessen-braun-grau-ocker-beige/3331331682-246-21232',similarity:'9 € je Vase aus einer Auswahl runder Keramikgefäße. Material und Größe des 3D-Gefäßes sind unbekannt; keine Bewertung.',similarityEn:'€9 per vase from an assortment of round ceramic vessels. The 3D vessel’s material and size are unknown; no valuation.'}]
 };
 for(const [category,listings] of Object.entries(more))comparisons[category]=(comparisons[category]??[]).concat(listings);
+
+// The seller's original German title remains in `title` and at the linked
+// listing. English mode shows these editorial translations in the demo.
+const titlesEnglish={
+ bed:['Beige upholstered bed with tall headboard and adjustable slatted base','Dark-grey single bed with upholstered headboard','Grey single bed with headboard, 90 × 200 cm','Bed with upholstered headboard, 210 × 165 cm'],
+ nightstand:['Nightstands, €10 each','Light-oak-look two-drawer nightstand or side table','Two light-oak-look nightstands with two drawers','Light-wood-look nightstand with two drawers','Light-wood two-drawer nightstand'],
+ lamp:['Grey and beige ceramic table lamp with fabric shade','Modern bedside lamp with velvet shade','Table lamp with grey fabric shade and metal base','Two decorative table lamps with ribbed bases and fabric shades','Modern table lamp with grey fabric shade and metal base','Table lamp with grey fabric shade'],
+ chair:['Grey upholstered chair','Set of four grey upholstered chairs with black legs','Grey velvet armchair','Upholstered design armchair'],
+ ottoman:['Large light-grey upholstered ottoman, approx. 97 × 80 cm','Round light-grey ottoman with metal base','Modern dark-grey upholstered bench','Dark-grey velvet storage bench, 133 cm'],
+ desk:['Rustic desk with two drawers and metal legs','Modern desk with drawers','Desk with wooden top and black metal frame'],
+ ceiling:['Modern round grey ceiling light, approx. 40 cm','Modern round white ceiling light'],
+ curtain:['Pair of light-grey blackout curtains, 260 × 140 cm','Pair of blackout curtains, 2.38 m long','Pair of light-grey thermal blackout curtains'],
+ vase:['Round ceramic vases and jugs in grey and brown']
+};
+for(const [category,titles] of Object.entries(titlesEnglish))comparisons[category].forEach((listing,index)=>{listing.titleEn=titles[index];});
