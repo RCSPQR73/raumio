@@ -623,3 +623,54 @@ body { background: var(--bg); color: var(--text); }
   .viewer:not(.placing) .object-card .sources-button { font-size: 9px; padding-inline: 7px; }
   .hero h1 { font-size: clamp(34px, 9.2vw, 54px); }
 }
+
+/* Keep each comparison panel closed until a visitor asks to inspect it. */
+.inventory-entry > details.row-source {
+  padding: 0;
+  background: #1b3024;
+  color: #a8c3af;
+}
+.inventory-entry > details.row-source > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 22px;
+  cursor: pointer;
+  list-style: none;
+  color: #a8c3af;
+  transition: color .18s ease, background .18s ease;
+}
+.inventory-entry > details.row-source > summary::-webkit-details-marker { display: none; }
+.inventory-entry > details.row-source > summary::after {
+  content: '+';
+  flex: 0 0 auto;
+  color: #a8c3af;
+  font-size: 18px;
+  line-height: 1;
+}
+.inventory-entry > details.row-source[open] > summary::after { content: '−'; }
+.inventory-entry > details.row-source > summary:hover { color: #e0efe2; background: #22392b; }
+.inventory-entry > details.row-source > button {
+  display: block;
+  min-height: 40px;
+  margin: 0 22px 12px;
+  padding: 8px 12px;
+  border: 1px solid #496451;
+  border-radius: 6px;
+  background: #243b2c;
+  color: #d2e5d4;
+  text-align: left;
+  cursor: pointer;
+}
+.inventory-entry > details.row-source > button:hover { background: #304b37; }
+.inventory-entry > details.row-source > summary:focus-visible,
+.inventory-entry > details.row-source > button:focus-visible {
+  outline: 2px solid #d4ead6;
+  outline-offset: 2px;
+}
+@media (max-width: 760px) {
+  .inventory-entry > details.row-source > summary { min-height: 42px; padding: 7px 14px; }
+  .inventory-entry > details.row-source > button { width: calc(100% - 28px); margin: 0 14px 11px; }
+}
