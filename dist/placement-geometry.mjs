@@ -70,9 +70,11 @@ export function placementProbePoints(kind,x,z,rotation=0,spacing=.095){
 // the supplied scene. Cached hit samples keep nearby drag positions responsive.
 export async function validateMeshPlacement(sample,kind,x,z,rotation=0,{cache=new Map(),originX=-10.2,originY=14,concurrency=8,step=.04,onProgress=()=>{},isCurrent=()=>true}={}){
   const points=placementProbePoints(kind,x,z,rotation,.075),height=FOOTPRINTS[kind].height,pending=[];
+  const blockerIds=new Set();
   for(const [px,pz] of points){
-    const key=`${(Math.round(px/step)*step).toFixed(2)}:${(Math.round(pz/step)*step).toFixed(2)}`;
-    if(cache.get(key)===false)return false;
+    const key=`${(Math.round(px/step)*step).toFixed(2)}:${(Math.round(pz/step)*step).toFixed(2)}:${height.toFixed(2)}`;
+    const known=cache.get(key);
+    if(known?.valid===false){if(known.blockedBy)blockerIds.add(known.blockedBy);return{valid:false,blockedBy:[...blockerIds]};}
     if(!cache.has(key))pending.push({key,x:Math.round(px/step)*step,z:Math.round(pz/step)*step});
   }
   let complete=0,failed=0,blocked=false;
@@ -84,18 +86,19 @@ export async function validateMeshPlacement(sample,kind,x,z,rotation=0,{cache=ne
       try{result=await sample(originX+point.x,originY-point.z,height);}
       catch{failed++;return;}
       if(['timeout','ray-error','no-position','clearance-timeout','clearance-error'].includes(result?.reason)){failed++;return;}
-      const valid=Boolean(result?.floor&&result?.clear);cache.set(point.key,valid);if(!valid)blocked=true;
+      const valid=Boolean(result?.floor&&result?.clear);cache.set(point.key,{valid,blockedBy:result?.blockedBy??null});if(!valid){blocked=true;if(result?.blockedBy)blockerIds.add(result.blockedBy);}
       if(cache.size>6000)cache.delete(cache.keys().next().value);
     }));
     complete+=batch.length;onProgress(complete,pending.length);
     if(!isCurrent())return false;
     if(failed>0)return null;
-    if(blocked)return false;
+    if(blocked)return{valid:false,blockedBy:[...blockerIds]};
   }
-  return points.every(([px,pz])=>{
-    const key=`${(Math.round(px/step)*step).toFixed(2)}:${(Math.round(pz/step)*step).toFixed(2)}`;
-    return cache.get(key)===true;
+  const valid=points.every(([px,pz])=>{
+    const key=`${(Math.round(px/step)*step).toFixed(2)}:${(Math.round(pz/step)*step).toFixed(2)}:${height.toFixed(2)}`;
+    const value=cache.get(key);if(value?.blockedBy)blockerIds.add(value.blockedBy);return value?.valid===true;
   });
+  return valid?true:{valid:false,blockedBy:[...blockerIds]};
 }
 export function nearestValidPlacement(kind,x,z,rotation=0,origin={x,z}){
   const valid=(px,pz)=>isValidPlacement(kind,px,pz,rotation);

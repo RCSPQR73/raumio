@@ -31,14 +31,26 @@ test('live hitbox validation samples the whole footprint and caches nearby rays'
   assert.equal(await validateMeshPlacement(sample,'pouf',0,0,45,{cache}),true);
   const firstCalls=calls;assert.ok(firstCalls>20);assert.equal(requestedHeight,.44);
   assert.equal(await validateMeshPlacement(sample,'pouf',0,0,45,{cache}),true);assert.equal(calls,firstCalls);
-  assert.equal(await validateMeshPlacement(sample,'chair',0,.55,0,{cache}),false);
+  assert.equal((await validateMeshPlacement(sample,'chair',0,.55,0,{cache})).valid,false);
 });
 
 test('live hitbox validation rejects an elevated obstruction or an incomplete probe',async()=>{
-  const blocked=async(x,y,height)=>({floor:true,clear:y<14.2,checkedHeight:height});
-  assert.equal(await validateMeshPlacement(blocked,'table',0,0,0),false,'a hit anywhere through the object height blocks placement');
+  const blocked=async(x,y,height)=>{const planX=x+10.2,planZ=14-y,blockedBy=planX>-.35&&planX<.35&&planZ>-.35&&planZ<.35?'bed':null;return{floor:true,clear:!blockedBy,blockedBy,checkedHeight:height};};
+  const result=await validateMeshPlacement(blocked,'table',0,0,0);
+  assert.equal(result.valid,false,'a hit anywhere through the object height blocks placement');
+  assert.ok(result.blockedBy.includes('bed'),'the intersected model object is retained for clear user feedback');
   const unknown=async()=>({floor:true,clear:false,reason:'clearance-timeout'});
   assert.equal(await validateMeshPlacement(unknown,'pouf',0,0,0),null,'unverified space must fail closed without being mislabeled as a collision');
+});
+
+test('clearance cache is height-specific when furniture changes',async()=>{
+  const cache=new Map();let calls=0;
+  const sample=async(x,y,height)=>{calls++;return{floor:true,clear:height<=.5};};
+  assert.equal(await validateMeshPlacement(sample,'pouf',0,-.2,0,{cache}),true);
+  const shortItemCalls=calls;assert.ok(shortItemCalls>0);
+  const chair=await validateMeshPlacement(sample,'chair',0,-.2,0,{cache});
+  assert.equal(chair.valid,false,'a shorter furniture check cannot certify clearance for a taller item');
+  assert.ok(calls>shortItemCalls,'taller furniture must query the extra clearance above the pouf');
 });
 
 test('an interrupted drag abandons obsolete ray batches before starting more probes',async()=>{

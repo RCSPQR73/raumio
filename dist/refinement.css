@@ -737,3 +737,7 @@ body { background: var(--bg); color: var(--text); }
 .placement-zone-label { display: inline-flex; align-items: center; min-height: 28px; padding: 5px 9px; border-radius: 999px; background: #e5efe4; color: #42624b; font-size: 10px; line-height: 1.4; }
 .placement-zone-label.is-adjusted { background: #f0e5d8; color: #855a33; }
 .placement-demo-size { white-space: nowrap; }
+#placement-controls .range-field output { color: #5b402f; font-weight: 600; }
+#placement-controls .range-field label { color: #4d5b50; }
+.placement-zone-label.is-blocked { background: #fae8e3; border-color: #d69383 !important; color: #8f3c2f !important; }
+.placement-zone-label.is-adjusted:not(.is-blocked) { background: #f5eddd; border-color: #d7ba7d !important; color: #775b2d !important; }

@@ -33,11 +33,11 @@ export function initializeCamera(objects,onFocus,onStatus){
    if((!Array.isArray(floorPoint)&&!ArrayBuffer.isView(floorPoint))||floorPoint.length<3)return{floor:false,clear:false,reason:'no-position',instanceID:floorHit.instanceID??null};
    const floorHeight=Number(floorPoint[2]),vertical=Math.abs(Number(floorNormal?.[2]??0));
    const floor=Number.isFinite(floorHeight)&&Math.abs(floorHeight)<=.045&&vertical>=.62;
-   if(!floor)return{floor:false,clear:false,height:floorHeight,vertical,instanceID:floorHit.instanceID??null};
+   if(!floor)return{floor:false,clear:false,height:floorHeight,vertical,instanceID:floorHit.instanceID??null,blockedBy:nodeIds.get(floorHit.instanceID)??null};
    let clearanceHit;
    try{clearanceHit=await sceneRay([x,y,.045],[x,y,objectHeight+.06]);}
    catch(error){return{floor:true,clear:false,reason:/timed out/i.test(String(error))?'clearance-timeout':'clearance-error'};}
-   return{floor:true,clear:!clearanceHit,height:floorHeight,vertical,obstacleID:clearanceHit?.instanceID??null};
+   return{floor:true,clear:!clearanceHit,height:floorHeight,vertical,obstacleID:clearanceHit?.instanceID??null,blockedBy:clearanceHit?nodeIds.get(clearanceHit.instanceID)??null:null};
   }catch(error){return{floor:false,clear:false,reason:/timed out/i.test(String(error))?'timeout':'ray-error'};}
  };
  function project(id){marker.hidden=!api||!id;}
@@ -55,5 +55,10 @@ export function initializeCamera(objects,onFocus,onStatus){
  api.addEventListener('camerastop',()=>{if(!active)return;api.getCameraLookAt((err,view)=>{if(!err){viewer.dataset.cameraObservedPosition=view.position.join(',');viewer.dataset.cameraObservedTarget=view.target.join(',');}if(!err&&view.position.some((v,i)=>Math.abs(v-FIXED_EYE[i])>.001))queue();});});
  });},error(){clearTimeout(watchdog);for(const waiter of readyWaiters)waiter.reject(new Error('3D room unavailable'));readyWaiters.length=0;onStatus('error');}});
  };sdk.onerror=()=>{clearTimeout(watchdog);for(const waiter of readyWaiters)waiter.reject(new Error('3D room unavailable'));readyWaiters.length=0;onStatus('error');};document.head.append(sdk);
- return{focus,async enterPlacement(){await whenReady();if(placementMode)return;placementMode=true;for(const id of hiddenForPlacement)api.hide(id);api.setCameraLookAt([-10.2,13.1,6.4],[-10.2,14.35,0],0);},samplePlacementFloor,exitPlacement(){if(!api||!placementMode)return;placementMode=false;for(const id of hiddenForPlacement)api.show(id);queue();},focusAndWait(index){if(!api)return Promise.reject(new Error(t('cameraNotReady')));return new Promise(resolve=>{const done=id=>{clearTimeout(timeout);resolve(id);};const timeout=setTimeout(()=>{focusWaiters.delete(done);resolve(lastId??null);},2500);focusWaiters.add(done);focus(index);});},setActive(value){active=value;surface.hidden=!value;controls.hidden=!value;marker.hidden=!value||!lastId;if(value){queue();pick();}else{pickSequence++;}},setLocked(value){locked=value;},dispose(){clearTimeout(watchdog);clearInterval(pickTimer);cancelAnimationFrame(frame);marker.remove();}};
+ const getViewerFov=()=>new Promise(resolve=>{
+  let settled=false;const timeout=setTimeout(()=>{if(!settled){settled=true;resolve(null);}},1200);
+  try{api.getFov((error,value)=>{if(settled)return;settled=true;clearTimeout(timeout);resolve(error?null:Number(value));});}
+  catch{clearTimeout(timeout);resolve(null);}
+ });
+ return{focus,async enterPlacement(){await whenReady();if(!placementMode){placementMode=true;for(const id of hiddenForPlacement)api.hide(id);api.setCameraLookAt([-10.2,13.1,6.4],[-10.2,14.35,0],0);}const fov=await getViewerFov();if(Number.isFinite(fov))viewer.dataset.placementFov=String(fov);return{fov};},samplePlacementFloor,exitPlacement(){if(!api||!placementMode)return;placementMode=false;for(const id of hiddenForPlacement)api.show(id);queue();},focusAndWait(index){if(!api)return Promise.reject(new Error(t('cameraNotReady')));return new Promise(resolve=>{const done=id=>{clearTimeout(timeout);resolve(id);};const timeout=setTimeout(()=>{focusWaiters.delete(done);resolve(lastId??null);},2500);focusWaiters.add(done);focus(index);});},setActive(value){active=value;surface.hidden=!value;controls.hidden=!value;marker.hidden=!value||!lastId;if(value){queue();pick();}else{pickSequence++;}},setLocked(value){locked=value;},dispose(){clearTimeout(watchdog);clearInterval(pickTimer);cancelAnimationFrame(frame);marker.remove();}};
 }
