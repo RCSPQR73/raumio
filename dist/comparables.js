@@ -7,3 +7,33 @@ export const comparisons={
  chair:[{title:'Polsterstuhl grau',price:20,date:'20.09.2026',location:'Reutlingen',url:'https://www.kleinanzeigen.de/s-anzeige/polsterstuhl-grau/3518143027-93-9346',similarity:'Dunkelgrauer Samt, niedrige Armlehnen, Rautensteppung, schwarze Beine mit goldenen Enden. Kein bestätigter Hersteller- oder Modelltreffer.'},{title:'Polsterstuhl Stühle grau gemütlich schwarze Beine 4x wie NEU',price:30,negotiable:true,date:'20.09.2026',location:'Glinde',url:'https://www.kleinanzeigen.de/s-anzeige/polsterstuhl-stuehle-grau-gemuetlich-schwarze-beine-4x-wie-neu/3518474727-88-614',similarity:'Grauer Stoff, gepolsterter rechteckiger Rücken, schwarze Beine; keine Armlehnen. Einzelpreis ausdrücklich 30 € VB; Viererset 100 €. Sitzhöhe etwa 44 cm. Allgemeiner Formvergleich.'}],
  ottoman:[{title:'Großer Polsterhocker hellgrau – ca. 97 × 80 cm',price:15,negotiable:true,date:'21.09.2026',location:'Wiesbaden',url:'https://www.kleinanzeigen.de/s-anzeige/grosser-polsterhocker-hellgrau-ca-97-80-cm/3519812669-88-4909',similarity:'Rechteckiges graues Stoffpolster mit gesteppter Oberseite, kurzen schwarzen Metallfüßen; 97 × 80 × 39 cm. Abmessungen und Unterbau im 3D-Modell sind nicht belegt. Ein einzelner Vergleich ergibt keine belastbare Preisspanne.'},{title:'Runder Polsterhocker in Hellgrau mit Metallfuß',price:22,negotiable:true,date:'01.09.2026',location:'Dinkelsbühl',url:'https://www.kleinanzeigen.de/s-anzeige/runder-polsterhocker-in-hellgrau-mit-metallfuss/3501268883-88-8840',similarity:'Hellgrauer runder Polsterhocker mit Metallfuß als Form- und Farbvergleich. Die runde Silhouette weicht vom länglichen Möbel im Raum ab; Maße und Marke des Modellmöbels sind nicht belegt.'}]
 };
+
+// English explanations for the bilingual comparison dialog. Listing titles
+// remain in the seller's original language and still link to the source.
+const similarityEnglish={
+ bed:[
+  '90 × 200 cm upholstered frame with a tall headboard and slatted base, without a mattress. Beige, smooth upholstery differs from the grey vertical panels in the room; the model dimensions are unknown.',
+  '90 × 200 cm bed with a grey padded headboard and slatted base, without a mattress. Square quilting, faux leather, drawers and electrical extras differ from the room model.'
+ ],
+ nightstand:[
+  'Light oak look and two drawers. The pair is listed for €20, so €10 is the calculated price per piece. Its size and condition differ; the room model’s material and size are unverified.',
+  'Light wood look, rectangular form and two drawers. Handle-free fronts differ from the model. Size and brand are unknown.',
+  'Two light oak-look nightstands with two drawers each. The €70 pair price is divided into €35 per piece. The room model’s dimensions and brand remain unknown.'
+ ],
+ lamp:[
+  'Round grey base and grey-beige fabric shade have a similar neutral palette. The lamp is more compact, and no dimensions are provided.',
+  'Glossy round grey base and a tall fabric shade. The rose velvet shade differs from the cream shade in the room; this is mainly a shape comparison.',
+  'Grey fabric shade and metal base match the visible lamp category. Shape, height and fitting are unverified, so this is a broad used-price comparison.',
+  'Grey fabric shade and decorative base. The €15 pair price is divided into €7.50 per piece; this is a calculated value rather than a single-item offer.',
+  'Grey fabric shade and silver metal base are close shape and colour references. Size and brand are missing; the negotiable price may change.'
+ ],
+ chair:[
+  'Dark-grey velvet, low armrests, diamond stitching and black legs with gold tips. No manufacturer or model match is confirmed.',
+  'Grey fabric, padded rectangular back and black legs, but without armrests. The seller names €30 negotiable per chair and €100 for four; this remains a broad shape comparison.'
+ ],
+ ottoman:[
+  'Rectangular grey upholstered bench with quilted top and short black metal legs, about 97 × 80 × 39 cm. The room model’s size and construction are unknown.',
+  'Light-grey round ottoman with metal base. Colour and purpose are similar, while the round silhouette differs from the longer piece in the room; size and brand are unverified.'
+ ]
+};
+for(const [category,notes] of Object.entries(similarityEnglish))comparisons[category].forEach((listing,index)=>{listing.similarityEn=notes[index];});

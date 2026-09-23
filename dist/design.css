@@ -33,3 +33,45 @@ body{background:var(--bg);font-weight:400}h1,h2,h3,p{overflow-wrap:normal}.wrap{
 .placement-panel{position:relative;z-index:6}
 @media(max-width:900px){.placement-context{top:58px;left:16px;right:auto;max-width:calc(100% - 32px)}}
 @media(max-width:760px){.placement-context{top:51px;font-size:9px}.placement-badge{left:12px;top:12px}.placement-help{left:12px;bottom:12px}}
+
+/* Keep the complete experience usable on narrow phones and with browser text zoom. */
+@media(max-width:560px){
+  html,body{max-width:100%;overflow-x:clip}
+  .inventory-head{display:none}
+  .inventory-top{align-items:stretch;flex-direction:column}
+  .filter-label select{display:block;width:100%;max-width:none}
+  .inventory-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"object value" "object platform";gap:4px 12px;align-items:start;padding:16px 14px}
+  .inventory-row>span:first-child{grid-area:object;min-width:0;align-items:flex-start;overflow-wrap:anywhere}
+  .inventory-row>span:nth-child(2){grid-area:value;min-width:0;text-align:right;white-space:nowrap;font-size:12px}
+  .inventory-row .row-platform{grid-area:platform;min-width:0;justify-content:flex-end;text-align:right;white-space:nowrap;font-size:9px}
+  .inventory-row .per-item{white-space:normal;max-width:105px;margin-left:auto;line-height:1.45}
+  .row-source{padding:10px 14px 14px;white-space:normal;overflow-wrap:anywhere;line-height:1.55}
+  .inventory-summary{padding-inline:14px;overflow-wrap:anywhere;line-height:1.55}
+  .valuation-card{min-width:0}
+  .total-price{font-size:clamp(39px,15vw,55px);white-space:normal}
+  .value-bars>div:not(.bar){align-items:flex-start}
+  .value-bars b{text-align:right}
+  .source-dialog{width:calc(100% - 20px);max-width:calc(100% - 20px);max-height:calc(100dvh - 20px);padding:19px}
+  .dialog-top{gap:12px}
+  .dialog-top h2{font-size:23px;overflow-wrap:anywhere}
+  .source-list li{min-width:0}
+  .source-dialog p,.source-list a,.source-list p{overflow-wrap:anywhere}
+}
+
+@media(max-width:340px){
+  .wrap{width:calc(100% - 24px)}
+  .header{gap:6px}
+  .logo{font-size:22px;gap:6px}
+  .logo svg{width:25px}
+  .language-toggle{margin-right:0}
+  .language-toggle button{padding:6px;font-size:8px}
+  .header .button.small{width:38px;min-width:38px;padding:0;gap:0;font-size:0}
+  .header .button.small:after{content:'↗';font-size:16px}
+  .mode-tabs button{min-width:0;padding-inline:3px;font-size:9px;gap:3px}
+  .quick-stats{grid-template-columns:1fr 1fr}
+  .quick-stats>div:nth-child(3){grid-column:1/-1}
+  .quick-stats>div:nth-child(3) .stat-number{white-space:normal}
+  .workspace-bottom>span{min-width:0;overflow-wrap:anywhere}
+  .inventory-row{gap:4px 8px;padding-inline:12px}
+  .row-source,.inventory-summary{padding-inline:12px}
+}

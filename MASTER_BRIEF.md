@@ -42,7 +42,7 @@ Das Produkt soll dabei:
 
 Die Website ist eine hochwertige Konzeptdemo und Landingpage. Sie erklärt das Produkt, zeigt den vorgesehenen Ablauf und macht den wichtigsten Interaktionskern früh sichtbar: einen breiten 3D-Raumviewer mit festem Kamerastandpunkt.
 
-Die aktuelle Demo verwendet das eingebettete Sketchfab-Modell **Hotel Room + Hallway** von Rafael Rodrigues. Die Möbelplatzierung nutzt zusätzlich eine lokale Referenzaufnahme desselben Raums, damit Explore und Platzieren visuell zusammengehören. Die Herkunft bleibt im Seitenfuß transparent angegeben. Das Modell wird nicht als eigenes Werk ausgegeben und darf nicht ohne passende Rechte heruntergeladen oder weiterverwendet werden.
+Die aktuelle Demo verwendet das eingebettete Sketchfab-Modell **Hotel Room + Hallway** von Rafael Rodrigues. Die Möbelplatzierung zeigt einen eigenständig aufgebauten 3D-Raumplan mit derselben erkennbaren Anordnung von Betten, Nachttisch, Leuchte und Schreibtisch, aber ohne Flur. Die Herkunft des Explore-Modells bleibt im Seitenfuß transparent angegeben. Das Modell wird nicht als eigenes Werk ausgegeben und darf nicht ohne passende Rechte heruntergeladen oder weiterverwendet werden.
 
 Die Demo enthält:
 
@@ -56,7 +56,7 @@ Die Demo enthält:
 - Beispielwerte aus recherchierten Kleinanzeigen-Angeboten.
 - Preis-An/Aus, Objektfilter und Quellen-Dialog.
 - eine Scan-Ablaufsimulation ohne Kamerazugriff.
-- eine Platzierungsdemo im selben Explore-Raum: lokale Referenzaufnahme plus transparenter Three.js-Möbel-Overlay mit Position, Drehung und Farbwahl.
+- eine Platzierungsdemo als eigenständiger 3D-Nachbau des Hotelzimmer-Grundrisses mit Position, Drehung und Farbwahl. Sie ist keine geometrisch identische Kopie des Explore-Modells.
 - ein English/Deutsch-Sprachmodul; English ist bei einem neuen Besuch die Standardsprache.
 - Tests für Preisberechnung, Marktquellen, Kamerainvarianten und eindeutige Objektzuordnung.
 
