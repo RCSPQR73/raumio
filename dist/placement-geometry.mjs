@@ -15,12 +15,11 @@ export const OBSTACLES = [
 ];
 
 export const FOOTPRINTS = {
-  chair:{width:.78,depth:.82},
-  table:{width:.60,depth:.60},
-  pouf:{width:.52,depth:.52}
+  chair:{width:.78,depth:.82,height:.86},
+  table:{width:.60,depth:.60,height:.45},
+  pouf:{width:.52,depth:.52,height:.44}
 };
 export const CLEARANCE = .09;
-export const MESH_GRID_STEP = .14;
 
 const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
 const onSegment=(p,a,b)=>Math.abs(cross(a,b,p))<1e-8&&p[0]>=Math.min(a[0],b[0])-1e-8&&p[0]<=Math.max(a[0],b[0])+1e-8&&p[1]>=Math.min(a[1],b[1])-1e-8&&p[1]<=Math.max(a[1],b[1])+1e-8;
@@ -50,30 +49,6 @@ export function isValidPlacement(kind,x,z,rotation=0){
   return footprint.every(point=>pointInPolygon(point,FLOOR))&&OBSTACLES.every(obstacle=>!polygonsIntersect(footprint,obstacle.polygon));
 }
 
-// Build a floor/occupancy raster from vertical rays against the actual
-// Sketchfab scene mesh. `sample` returns {floor, ...} for world-space x/y.
-export async function buildMeshFloorMap(sample,{originX=-10.2,originY=14,step=MESH_GRID_STEP,batchSize=12,onProgress=()=>{}}={}){
-  const minX=FLOOR[0][0],maxX=FLOOR[1][0],minZ=FLOOR[0][1],maxZ=FLOOR[2][1];
-  const cols=Math.ceil((maxX-minX)/step),rows=Math.ceil((maxZ-minZ)/step),cells=[];
-  for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
-    const x=minX+(col+.5)*step,z=minZ+(row+.5)*step;
-    cells.push({x,z,floor:false,checked:false});
-  }
-  let complete=0,probeFailures=0;
-  for(let i=0;i<cells.length;i+=batchSize){
-    const batch=cells.slice(i,i+batchSize);
-    await Promise.all(batch.map(async cell=>{
-      const result=await sample(originX+cell.x,originY-cell.z);
-      cell.floor=Boolean(result?.floor);cell.height=Number.isFinite(result?.height)?result.height:null;
-      cell.vertical=Number.isFinite(result?.vertical)?result.vertical:null;cell.instanceID=result?.instanceID??null;cell.checked=true;
-      if(['timeout','ray-error','no-position'].includes(result?.reason))probeFailures++;
-    }));
-    complete+=batch.length;onProgress(complete,cells.length);
-    if(complete>=24&&probeFailures>complete*.5)throw new Error('Room mesh ray probes are unavailable');
-  }
-  return{minX,minZ,step,cols,rows,cells,originX,originY,source:'sketchfab-mesh-rays'};
-}
-
 const pointOnSegmentDistance=(p,a,b)=>{
   const dx=b[0]-a[0],dy=b[1]-a[1],length=dx*dx+dy*dy;
   const t=length?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/length)):0;
@@ -91,33 +66,43 @@ export function placementProbePoints(kind,x,z,rotation=0,spacing=.095){
   const seen=new Set();return points.filter(([px,pz])=>{const k=`${px.toFixed(3)}:${pz.toFixed(3)}`;if(seen.has(k))return false;seen.add(k);return true;});
 }
 
-export function isMeshPlacementValid(kind,x,z,rotation,map){
-  if(!map?.cells?.length)return null;
-  const points=placementProbePoints(kind,x,z,rotation);
+// Validate the complete padded footprint against live, vertical rays through
+// the supplied scene. Cached hit samples keep nearby drag positions responsive.
+export async function validateMeshPlacement(sample,kind,x,z,rotation=0,{cache=new Map(),originX=-10.2,originY=14,concurrency=8,step=.04,onProgress=()=>{},isCurrent=()=>true}={}){
+  const points=placementProbePoints(kind,x,z,rotation,.075),height=FOOTPRINTS[kind].height,pending=[];
+  for(const [px,pz] of points){
+    const key=`${(Math.round(px/step)*step).toFixed(2)}:${(Math.round(pz/step)*step).toFixed(2)}`;
+    if(cache.get(key)===false)return false;
+    if(!cache.has(key))pending.push({key,x:Math.round(px/step)*step,z:Math.round(pz/step)*step});
+  }
+  let complete=0,failed=0,blocked=false;
+  for(let i=0;i<pending.length;i+=concurrency){
+    if(!isCurrent())return false;
+    const batch=pending.slice(i,i+concurrency);
+    await Promise.all(batch.map(async point=>{
+      let result;
+      try{result=await sample(originX+point.x,originY-point.z,height);}
+      catch{failed++;return;}
+      if(['timeout','ray-error','no-position','clearance-timeout','clearance-error'].includes(result?.reason)){failed++;return;}
+      const valid=Boolean(result?.floor&&result?.clear);cache.set(point.key,valid);if(!valid)blocked=true;
+      if(cache.size>6000)cache.delete(cache.keys().next().value);
+    }));
+    complete+=batch.length;onProgress(complete,pending.length);
+    if(!isCurrent())return false;
+    if(failed>0)return null;
+    if(blocked)return false;
+  }
   return points.every(([px,pz])=>{
-    const col=Math.floor((px-map.minX)/map.step),row=Math.floor((pz-map.minZ)/map.step);
-    if(col<0||row<0||col>=map.cols||row>=map.rows)return false;
-    return map.cells[row*map.cols+col]?.floor===true;
+    const key=`${(Math.round(px/step)*step).toFixed(2)}:${(Math.round(pz/step)*step).toFixed(2)}`;
+    return cache.get(key)===true;
   });
 }
-
-export function meshFloorPolygons(map){
-  if(!map?.cells)return[];
-  const inset=map.step*.07,polygons=[];
-  for(const cell of map.cells)if(cell.floor)polygons.push([
-    [cell.x-map.step/2+inset,cell.z-map.step/2+inset],
-    [cell.x+map.step/2-inset,cell.z-map.step/2+inset],
-    [cell.x+map.step/2-inset,cell.z+map.step/2-inset],
-    [cell.x-map.step/2+inset,cell.z+map.step/2-inset]
-  ]);
-  return polygons;
-}
-export function nearestValidPlacement(kind,x,z,rotation=0,origin={x,z},meshMap=null){
-  const valid=(px,pz)=>meshMap?isMeshPlacementValid(kind,px,pz,rotation,meshMap)===true:isValidPlacement(kind,px,pz,rotation);
+export function nearestValidPlacement(kind,x,z,rotation=0,origin={x,z}){
+  const valid=(px,pz)=>isValidPlacement(kind,px,pz,rotation);
   if(valid(x,z))return{x,z};
   // A small deterministic spiral keeps drag/slider motion responsive while it
   // finds the closest valid point around an occupied corner or boundary.
-  const step=.08,max=meshMap?3.6:1.44;
+  const step=.08,max=1.44;
   for(let radius=step;radius<=max;radius+=step){
     const count=Math.max(12,Math.ceil(2*Math.PI*radius/step));
     for(let i=0;i<count;i++){

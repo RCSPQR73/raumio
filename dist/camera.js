@@ -21,18 +21,24 @@ export function initializeCamera(objects,onFocus,onStatus){
   const timeout=setTimeout(()=>reject(new Error('Room mesh ray timed out')),1800);
   api.pickFromScene(start,end,(err,hit)=>{clearTimeout(timeout);if(err)reject(err);else resolve(hit??null);});
  });
- const samplePlacementFloor=async(x,y)=>{
-  // The placement planner is a top-down overlay in the model's world space
-  // (Sketchfab asset uses Z-up). A vertical mesh ray tests the real room mesh.
+ const samplePlacementFloor=async(x,y,objectHeight=.86)=>{
+  // The asset uses Z-up. The short downward ray isolates the floor surface
+  // beneath elevated furniture; a second upward ray checks the actual mesh
+  // volume from floor level to the placed item's top.
   try{
-   const hit=await sceneRay([x,y,3.5],[x,y,-1]);
-   if(!hit)return{floor:false,reason:'no-surface'};
-   const point=hit.position3D??hit.position??hit.coord?.position3D;
-   const normal=hit.normal??hit.coord?.normal;
-   if(!Array.isArray(point)||point.length<3)return{floor:false,reason:'no-position',instanceID:hit.instanceID??null};
-   const height=Number(point[2]),vertical=Math.abs(Number(normal?.[2]??0));
-   return{floor:Number.isFinite(height)&&height<=.10&&vertical>=.62,height,vertical,instanceID:hit.instanceID??null};
-  }catch(error){return{floor:false,reason:/timed out/i.test(String(error))?'timeout':'ray-error'};}
+   const floorHit=await sceneRay([x,y,.18],[x,y,-.12]);
+   if(!floorHit)return{floor:false,clear:false,reason:'no-floor'};
+   const floorPoint=floorHit.position3D??floorHit.position??floorHit.coord?.position3D;
+   const floorNormal=floorHit.normal??floorHit.coord?.normal;
+   if((!Array.isArray(floorPoint)&&!ArrayBuffer.isView(floorPoint))||floorPoint.length<3)return{floor:false,clear:false,reason:'no-position',instanceID:floorHit.instanceID??null};
+   const floorHeight=Number(floorPoint[2]),vertical=Math.abs(Number(floorNormal?.[2]??0));
+   const floor=Number.isFinite(floorHeight)&&Math.abs(floorHeight)<=.045&&vertical>=.62;
+   if(!floor)return{floor:false,clear:false,height:floorHeight,vertical,instanceID:floorHit.instanceID??null};
+   let clearanceHit;
+   try{clearanceHit=await sceneRay([x,y,.045],[x,y,objectHeight+.06]);}
+   catch(error){return{floor:true,clear:false,reason:/timed out/i.test(String(error))?'clearance-timeout':'clearance-error'};}
+   return{floor:true,clear:!clearanceHit,height:floorHeight,vertical,obstacleID:clearanceHit?.instanceID??null};
+  }catch(error){return{floor:false,clear:false,reason:/timed out/i.test(String(error))?'timeout':'ray-error'};}
  };
  function project(id){marker.hidden=!api||!id;}
  function emit(id){if(id!==lastId){lastId=id;onFocus(id);for(const done of focusWaiters)done(id);focusWaiters.clear();}project(id);}

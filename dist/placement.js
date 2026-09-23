@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
-import {furniture,euro} from './data.js?v=20260923x';
-import {t} from './locale.js?v=20260923x';
-import {buildMeshFloorMap,meshFloorPolygons,isMeshPlacementValid,nearestValidPlacement} from './placement-geometry.mjs?v=20260923x';
+import {furniture,euro} from './data.js?v=20260923z';
+import {t} from './locale.js?v=20260923z';
+import {isValidPlacement,nearestValidPlacement,validateMeshPlacement} from './placement-geometry.mjs?v=20260923z';
 
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const BASE={x:-10.2,y:14.0};
@@ -21,7 +21,7 @@ export function createPlacement(stage,controlsHost,notify){
  </div>`;
  const canvas=stage.querySelector('#placement-canvas');
  const controls={x:controlsHost.querySelector('#furniture-x'),z:controlsHost.querySelector('#furniture-z'),rotation:controlsHost.querySelector('#furniture-rotation')};
- let active=false,animation=0,raf=0,kind='chair',drag=null,renderer,lastValid={x:-.55,z:.05},meshMap=null,scanSequence=0,meshRequired=false,
+ let active=false,animation=0,raf=0,kind='chair',drag=null,renderer,lastValid={x:-.55,z:.05},lastVerifiedRotation=0,meshRequired=false,meshProbe=null,validationSequence=0,probeCache=new Map(),validationTimer=0,lastVerified=false,
      bounds={x:[-4.05,3.55],z:[-3.65,2.85]};
  try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,premultipliedAlpha:false});}
  catch{canvas.insertAdjacentHTML('beforeend',`<div class="placement-failure">${t('webgl')}</div>`);controlsHost.querySelectorAll('button,input').forEach(control=>control.disabled=true);return{play(){notify(t('webglToast'));},stop(){},setLanguage(){},setActive(){},dispose(){}};}
@@ -44,7 +44,6 @@ export function createPlacement(stage,controlsHost,notify){
  const poufWood=new THREE.MeshStandardMaterial({color:'#493629',roughness:.42,metalness:0});
  const shadowMaterial=new THREE.MeshBasicMaterial({color:'#17241d',transparent:true,opacity:.17,depthWrite:false});
  const shadow=new THREE.Mesh(new THREE.CircleGeometry(.52,48),shadowMaterial);shadow.position.z=.025;scene.add(shadow);
- const zoneFill=new THREE.MeshBasicMaterial({color:'#a8d8ac',transparent:true,opacity:.13,depthWrite:false,side:THREE.DoubleSide});
  const zoneGroup=new THREE.Group();scene.add(zoneGroup);
  const roundedPrism=(w,d,h,r,x,y,z,material)=>{
   const shape=new THREE.Shape(),q=Math.min(r,w/2,d/2);shape.moveTo(-w/2+q,-d/2);shape.lineTo(w/2-q,-d/2);shape.absarc(w/2-q,-d/2+q,q,-Math.PI/2,0,false);shape.lineTo(w/2,d/2-q);shape.absarc(w/2-q,d/2-q,q,0,Math.PI/2,false);shape.lineTo(-w/2+q,d/2);shape.absarc(-w/2+q,d/2-q,q,Math.PI/2,Math.PI,false);shape.lineTo(-w/2,-d/2+q);shape.absarc(-w/2+q,-d/2+q,q,Math.PI,Math.PI*1.5,false);
@@ -57,14 +56,7 @@ export function createPlacement(stage,controlsHost,notify){
  const disposeGroup=group=>{for(const child of [...group.children]){group.remove(child);child.geometry?.dispose();}};
  const setZone=()=>{
   for(const axis of ['x','z']){controls[axis].min=String(bounds[axis][0]);controls[axis].max=String(bounds[axis][1]);controls[axis].step='.02';}
-  disposeGroup(zoneGroup);
-  if(meshMap){
-   const polygons=meshFloorPolygons(meshMap),positions=[],indices=[];
-   for(const polygon of polygons){const base=positions.length/3;for(const [x,z] of polygon){positions.push(BASE.x+x,BASE.y-z,.012);}indices.push(base,base+1,base+2,base,base+2,base+3);}
-   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setIndex(indices);geometry.computeVertexNormals();
-   const floorMesh=new THREE.Mesh(geometry,zoneFill);floorMesh.renderOrder=3;zoneGroup.add(floorMesh);
-  }
-  controlsHost.querySelector('.placement-zone-label').textContent=meshMap?`✓ ${t('placementMeshReady')}`:t('placementMeshScanning');
+  controlsHost.querySelector('.placement-zone-label').textContent=meshRequired?t('placementMeshScanning'):`✓ ${t('placementMeshReady')}`;
  };
  const makePouf=()=>{
   // Tailored low pouf with a recessed wood base, shaped upholstery and fine welt.
@@ -119,46 +111,29 @@ export function createPlacement(stage,controlsHost,notify){
   render();
  };
  const render=()=>renderer.render(scene,camera);
- const update=()=>{
-  const rotation=Number(controls.rotation.value),requested={x:clamp(Number(controls.x.value),...bounds.x),z:clamp(Number(controls.z.value),...bounds.z)};
-  const snapped=meshRequired&&!meshMap?lastValid:(nearestValidPlacement(kind,requested.x,requested.z,rotation,lastValid,meshMap)||lastValid);
-  const changed=Math.hypot(snapped.x-requested.x,snapped.z-requested.z)>.025;
-  const x=snapped.x,z=snapped.z;controls.x.value=String(x);controls.z.value=String(z);
-  const valid=meshRequired?Boolean(meshMap&&isMeshPlacementValid(kind,x,z,rotation,meshMap)===true):true;
-  object.visible=valid;
-  if(valid)lastValid={x,z};
+ const applyPosition=(x,z,rotation)=>{
   object.position.set(BASE.x+x,BASE.y-z,0);object.rotation.z=rotation*Math.PI/180;
   shadow.position.x=object.position.x;shadow.position.y=object.position.y;
   for(const key of ['x','z'])controlsHost.querySelector(`#furniture-${key}-value`).textContent=Number(controls[key].value).toLocaleString(document.documentElement.lang==='de'?'de-DE':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})+' m';
   controlsHost.querySelector('#furniture-rotation-value').textContent=rotation+'°';
-  const status=controlsHost.querySelector('.placement-zone-label');status.textContent=!meshMap?t('placementMeshScanning'):changed?t('placementSnapped'):t('placementClearance');status.classList.toggle('is-adjusted',changed||!meshMap);status.classList.toggle('is-mesh-ready',Boolean(meshMap));
   render();
  };
- const scanRoomMesh=async sample=>{
-  if(meshMap)return;
-  const sequence=++scanSequence;meshRequired=true;meshMap=null;setZone();update();
-  try{
-   const map=await buildMeshFloorMap(sample,{onProgress:(done,total)=>{
-    if(sequence!==scanSequence)return;
-    const status=controlsHost.querySelector('.placement-zone-label');
-    status.textContent=`${t('placementMeshScanning')} ${Math.round(done/total*100)}%`;
+ const update=()=>{
+  const rotation=Number(controls.rotation.value),requested={x:clamp(Number(controls.x.value),...bounds.x),z:clamp(Number(controls.z.value),...bounds.z)};
+  if(!meshRequired){const snapped=nearestValidPlacement(kind,requested.x,requested.z,rotation,lastValid);const x=snapped?.x??lastValid.x,z=snapped?.z??lastValid.z;controls.x.value=String(x);controls.z.value=String(z);applyPosition(x,z,rotation);const changed=Math.hypot(x-requested.x,z-requested.z)>.025;const status=controlsHost.querySelector('.placement-zone-label');status.textContent=changed?t('placementSnapped'):t('placementClearance');status.classList.toggle('is-adjusted',changed);return;}
+  clearTimeout(validationTimer);const sequence=++validationSequence;
+  if(!meshProbe){object.visible=false;controlsHost.querySelector('.placement-zone-label').textContent=t('placementMeshUnavailable');return;}
+  controlsHost.querySelector('.placement-zone-label').textContent=t('placementMeshChecking');
+  controlsHost.querySelector('.placement-zone-label').classList.remove('is-adjusted');
+  validationTimer=setTimeout(async()=>{
+   const valid=await validateMeshPlacement(meshProbe,kind,requested.x,requested.z,rotation,{cache:probeCache,isCurrent:()=>sequence===validationSequence&&active,onProgress:(done,total)=>{
+    if(sequence===validationSequence&&total)controlsHost.querySelector('.placement-zone-label').textContent=`${t('placementMeshChecking')} ${Math.round(done/total*100)}%`;
    }});
-   if(sequence!==scanSequence)return;
-   const clear=map.cells.filter(cell=>cell.floor).length;
-   if(clear<25)throw new Error('Room floor mesh was not detected');
-   meshMap=map;setZone();
-   if(!isMeshPlacementValid(kind,Number(controls.x.value),Number(controls.z.value),Number(controls.rotation.value),meshMap)){
-    const nearest=nearestValidPlacement(kind,Number(controls.x.value),Number(controls.z.value),Number(controls.rotation.value),lastValid,meshMap);
-    if(nearest){controls.x.value=String(nearest.x);controls.z.value=String(nearest.z);lastValid=nearest;}
-   }
-   update();
-  }catch(error){
-   if(sequence!==scanSequence)return;
-   meshMap=null;setZone();update();
-   controlsHost.querySelector('.placement-zone-label').textContent=t('placementMeshUnavailable');
-   controlsHost.querySelector('.placement-zone-label').classList.add('is-adjusted');
-   notify(t('placementMeshUnavailable'));
-  }
+   if(sequence!==validationSequence||!active)return;
+   const status=controlsHost.querySelector('.placement-zone-label');
+   if(valid===true){controls.x.value=String(requested.x);controls.z.value=String(requested.z);lastValid={x:requested.x,z:requested.z};lastVerifiedRotation=rotation;lastVerified=true;object.visible=true;applyPosition(requested.x,requested.z,rotation);status.textContent=t('placementClearance');status.classList.remove('is-adjusted');}
+   else{controls.x.value=String(lastValid.x);controls.z.value=String(lastValid.z);if(lastVerified)controls.rotation.value=String(lastVerifiedRotation);applyPosition(lastValid.x,lastValid.z,lastVerified?lastVerifiedRotation:rotation);object.visible=lastVerified;status.textContent=t(valid===null?'placementMeshUnavailable':'placementBlocked');status.classList.add('is-adjusted');}
+  },100);
  };
  const localize=()=>{
   stage.querySelector('.placement-badge').textContent=t('placementBadge');stage.querySelector('.placement-help').textContent=t('placementHelp');
@@ -173,21 +148,21 @@ export function createPlacement(stage,controlsHost,notify){
  const stop=()=>{cancelAnimationFrame(raf);animation=0;controlsHost.querySelector('#animate-furniture').textContent=t('playDemo');};
  const play=()=>{
   if(animation){stop();return;}
-  animation=performance.now();controlsHost.querySelector('#animate-furniture').textContent=t('stopDemo');
-  const tick=now=>{if(!active){stop();return;}const p=Math.min((now-animation)/5200,1),x=-3.2+6.0*p,z=-.18+Math.sin(p*Math.PI*2)*.62;controls.x.value=String(x);controls.z.value=String(z);controls.rotation.value=String(Math.round(p*85/5)*5);update();if(p<1)raf=requestAnimationFrame(tick);else{stop();notify(t('placementDone'));}};
+  animation=performance.now();let lastProbe=0;controlsHost.querySelector('#animate-furniture').textContent=t('stopDemo');
+  const tick=now=>{if(!active){stop();return;}const p=Math.min((now-animation)/5200,1);if(now-lastProbe>620||p===1){lastProbe=now;const x=-3.2+6.0*p,z=-.18+Math.sin(p*Math.PI*2)*.62;controls.x.value=String(x);controls.z.value=String(z);controls.rotation.value=String(Math.round(p*85/5)*5);update();}if(p<1)raf=requestAnimationFrame(tick);else{stop();notify(t('placementDone'));}};
   raf=requestAnimationFrame(tick);
  };
  Object.values(controls).forEach(input=>input.addEventListener('input',()=>{stop();update();}));
- controlsHost.querySelectorAll('[data-furniture]').forEach(button=>button.addEventListener('click',()=>{stop();kind=button.dataset.furniture;setZone();controls.x.value='0';controls.z.value='-.2';controls.rotation.value='0';rebuild();update();}));
+ controlsHost.querySelectorAll('[data-furniture]').forEach(button=>button.addEventListener('click',()=>{stop();kind=button.dataset.furniture;lastVerified=false;object.visible=false;setZone();controls.x.value='0';controls.z.value='-.2';controls.rotation.value='0';rebuild();update();}));
  controlsHost.querySelector('#animate-furniture').addEventListener('click',play);
  controlsHost.querySelector('#reset-furniture').addEventListener('click',()=>{stop();controls.x.value='0';controls.z.value='-.2';controls.rotation.value='0';update();notify(t('resetDone'));});
  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2(),floor=new THREE.Plane(new THREE.Vector3(0,0,1),0),point=new THREE.Vector3();
  const pointAt=event=>{const rect=renderer.domElement.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.ray.intersectPlane(floor,point)?point.clone():null;};
  renderer.domElement.addEventListener('pointerdown',event=>{if(!active)return;const p=pointAt(event);if(!p)return;stop();drag={dx:object.position.x-p.x,dy:object.position.y-p.y};renderer.domElement.setPointerCapture(event.pointerId);renderer.domElement.classList.add('dragging');});
  renderer.domElement.addEventListener('pointermove',event=>{if(!drag)return;const p=pointAt(event);if(!p)return;controls.x.value=String(clamp(p.x+drag.dx-BASE.x,...bounds.x));controls.z.value=String(clamp(BASE.y-(p.y+drag.dy),...bounds.z));update();});
- for(const event of ['pointerup','pointercancel','lostpointercapture'])renderer.domElement.addEventListener(event,()=>{drag=null;renderer.domElement.classList.remove('dragging');});
+ for(const event of ['pointerup','pointercancel','lostpointercapture'])renderer.domElement.addEventListener(event,()=>{const wasDragging=Boolean(drag);drag=null;renderer.domElement.classList.remove('dragging');if(wasDragging)update();});
  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();stop();notify(t('graphicsPaused'));});
  const observer=new ResizeObserver(()=>{const width=canvas.clientWidth,height=canvas.clientHeight;if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();render();});observer.observe(canvas);
  localize();controls.x.value='0';controls.z.value='-.2';update();
- return{play,stop,scanRoomMesh,setLanguage(){localize();update();},setActive(value){active=value;if(!value)stop();else render();},dispose(){scanSequence++;stop();observer.disconnect();for(const mesh of object.children)mesh.geometry?.dispose();for(const material of object.userData.detailMaterials||[])material.dispose();disposeGroup(zoneGroup);cloth.dispose();cushionCloth.dispose();wood.dispose();woodLight.dispose();metal.dispose();poufFabric.dispose();poufTop.dispose();poufPiping.dispose();poufWood.dispose();zoneFill.dispose();shadow.geometry.dispose();shadow.material.dispose();renderer.dispose();}};
+ return{play,stop,requireMesh(){meshRequired=true;lastVerified=false;object.visible=false;setZone();update();},setMeshProbe(sample){meshRequired=true;meshProbe=sample;lastVerified=false;object.visible=false;probeCache.clear();setZone();update();},setLanguage(){localize();update();},setActive(value){active=value;if(!value){stop();validationSequence++;clearTimeout(validationTimer);}else render();},dispose(){validationSequence++;clearTimeout(validationTimer);stop();observer.disconnect();for(const mesh of object.children)mesh.geometry?.dispose();for(const material of object.userData.detailMaterials||[])material.dispose();disposeGroup(zoneGroup);cloth.dispose();cushionCloth.dispose();wood.dispose();woodLight.dispose();metal.dispose();poufFabric.dispose();poufTop.dispose();poufPiping.dispose();poufWood.dispose();shadow.geometry.dispose();shadow.material.dispose();renderer.dispose();}};
 }
