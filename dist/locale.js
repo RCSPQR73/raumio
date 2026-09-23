@@ -35,6 +35,7 @@ Object.assign(dynamicMaps.de,{'Loading 3D room …':'3D-Raum wird geladen …','
 Object.assign(dynamicMaps.en,{'comparison offers comparison offers & reasoning ↗':'comparison offers & reasoning ↗'});
 Object.assign(dynamicMaps.de,{'Vergleichsangebote Vergleichsangebote & Herleitung ansehen ↗':'Vergleichsangebote & Herleitung ansehen ↗'});
 Object.assign(translations.en,{
+ openGroup:'group open',
  comparisonBasis:'& reasoning ↗',
  modePlace:'Room plan based on the Explore model · sample furniture',
  placeIntro:'Try position, rotation and colour in a room-only 3D plan based on the Explore model. The hallway is left out.',
@@ -47,6 +48,7 @@ Object.assign(translations.en,{
  placementAria:'Interactive 3D room plan with movable sample furniture'
 });
 Object.assign(translations.de,{
+ openGroup:'Gruppe offen',
  comparisonBasis:'& Herleitung ansehen ↗',
  modePlace:'Raumplan nach dem Explore-Modell · Beispielmöbel',
  placeIntro:'Teste Position, Drehung und Farbe in einem eigenen 3D-Raumplan nach dem Explore-Modell. Der Flur ist ausgeblendet.',

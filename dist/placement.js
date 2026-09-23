@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.js';
-import {furniture,euro} from './data.js?v=20260923b';
-import {t} from './locale.js?v=20260923b';
+import {furniture,euro} from './data.js?v=20260923c';
+import {t} from './locale.js?v=20260923c';
 
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 
