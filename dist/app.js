@@ -1,7 +1,7 @@
-import {objects,price,stateLabel,total,euro,marketLink} from './data.js?v=20260923i';
-import {initializeCamera} from './camera.js?v=20260923i';
-import {t,objectText,getLanguage,initLanguage,onLanguageChange,setLanguage} from './locale.js?v=20260923i';
-import {createPlacement} from './placement.js?v=20260923i';
+import {objects,price,stateLabel,total,euro,marketLink} from './data.js?v=20260923j';
+import {initializeCamera} from './camera.js?v=20260923j';
+import {t,objectText,getLanguage,initLanguage,onLanguageChange,setLanguage} from './locale.js?v=20260923j';
+import {createPlacement} from './placement.js?v=20260923j';
 const $=s=>document.querySelector(s);let selected=0,focused=null,mode='explore',showPrices=true,placement=null,scanTimer=null,scanStep=0,toastTimer;window.__raumioShowPrices=true;
 function applyObjectLanguage(){for(const o of objects){for(const key of ['name','detail','reason'])o[key]=objectText(o.id,key);}}
 function notify(message){$('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3500);}
@@ -18,7 +18,7 @@ function openSources(o){
  if(o.id==='bed')method+=' '+t('sourceMethodBed');
  if(o.quantity>1)method+=' '+format('sourceQuantity',{n:o.quantity});
  const searchLinks=o.query?`<div class="source-discovery"><div><strong>${t('liveOffersTitle')}</strong><p>${t('liveOffersNote')}</p></div><a href="${marketLink(o)}" target="_blank" rel="noopener noreferrer">Kleinanzeigen ↗</a><a href="https://www.ebay.de/sch/i.html?_nkw=${encodeURIComponent(o.query)}" target="_blank" rel="noopener noreferrer">eBay ↗</a></div>`:'';
- const listings=(o.comparables??[]).map(c=>`<li><a href="${c.url}" target="_blank" rel="noopener noreferrer" ${english?'lang="en"':'lang="de"'}>${english?(c.titleEn??c.title):c.title} ↗</a><strong>${euro(c.price)}${c.negotiable?' · '+t('negotiable'):''}</strong><p>${english?(c.similarityEn??c.similarity):c.similarity}</p><p>${c.date} · ${c.location??(english?'Germany':'Deutschland')} · Kleinanzeigen</p><p>${c.availability??t('listingAvailable')}</p></li>`).join('');
+ const listings=(o.comparables??[]).map(c=>`<li><a href="${c.url}" target="_blank" rel="noopener noreferrer" ${english?'lang="en"':'lang="de"'}>${english?(c.titleEn??c.title):c.title} ↗</a><strong>${euro(c.price)}${c.negotiable?' · '+t('negotiable'):''}</strong>${c.useInRange===false?`<span class="range-excluded">${t('excludedFromRange')}</span>`:''}<p>${english?(c.similarityEn??c.similarity):c.similarity}</p><p>${c.date} · ${c.location??(english?'Germany':'Deutschland')} · Kleinanzeigen</p><p>${c.availability??t('listingAvailable')}</p></li>`).join('');
  $('#source-body').innerHTML=`<p>${o.reason}</p><div class="source-method">${method}</div>${listings?`<p class="listing-title-note">${t('listingTitleNote')}</p><ul class="source-list">${listings}</ul>`:''}${searchLinks}<p class="source-caution">${t('sourceResearch')}</p>`;
  if(!dialog.open)dialog.showModal();
 }

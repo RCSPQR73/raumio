@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.js';
-import {furniture,euro} from './data.js?v=20260923i';
-import {t} from './locale.js?v=20260923i';
+import {furniture,euro} from './data.js?v=20260923j';
+import {t} from './locale.js?v=20260923j';
 
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const BASE={x:-10.2,y:14.0};

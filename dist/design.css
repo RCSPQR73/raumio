@@ -75,3 +75,4 @@ body{background:var(--bg);font-weight:400}h1,h2,h3,p{overflow-wrap:normal}.wrap{
   .inventory-row{gap:4px 8px;padding-inline:12px}
   .row-source,.inventory-summary{padding-inline:12px}
 }
+.range-excluded{display:inline-flex;align-items:center;margin:8px 0 0;padding:4px 8px;border:1px solid #65756b;border-radius:99px;color:#bac8be;font-size:10px;letter-spacing:.02em}

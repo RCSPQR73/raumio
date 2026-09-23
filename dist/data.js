@@ -1,5 +1,5 @@
-import {comparisons} from './comparables.js?v=20260923i';
-import {t} from './locale.js?v=20260923i';
+import {comparisons} from './comparables.js?v=20260923j';
+import {t} from './locale.js?v=20260923j';
 export const objects = [
  {id:'bed',name:'Polsterbetten',quantity:2,detail:'Zwei Betten · Gepolstertes Kopfteil',min:null,max:null,state:'safe',platform:'Kleinanzeigen',reason:'Kategorie im 3D-Modell bestätigt. Hersteller, Breite und Material sind nicht belegt.',query:'Polsterbett 90x200 grau',nodes:[3,4,5,22,23,24],anchor:[-11.9533,16.05,.65],icon:'bed',comparables:[]},
  {id:'nightstand',name:'Nachttisch',quantity:1,detail:'Holzoptik · Schubladen',min:null,max:null,state:'safe',platform:'Kleinanzeigen',reason:'Nachttisch im Modell eindeutig. Das Holz und der Hersteller sind nicht bestätigt.',query:'Nachttisch Holz Schubladen',nodes:[41,42,43],anchor:[-10.2533,16.831,.55],icon:'table',comparables:[]},
@@ -20,7 +20,7 @@ for(const o of objects){
    const ranged=o.comparables.filter(c=>c.useInRange!==false);
    o.min=Math.min(...ranged.map(c=>c.price));o.max=Math.max(...ranged.map(c=>c.price));
    o.method=`Min–Max aus ${ranged.length} verlinkten gebrauchten Vergleichsangeboten, jeweils pro Stück. Die Stichprobe ist erweitert, aber nicht repräsentativ; es handelt sich um Angebotspreise und keine statistische Marktwertschätzung.`;
-   if(o.id==='bed')o.method+=' Beide Vergleichsangebote ohne Matratze. Bettwäsche und Matratzen des Modellraums sind nicht bewertet.';
+   if(o.id==='bed')o.method+=' Die Spanne verwendet graue Polsterbetten mit 90 × 200 cm Liegefläche, ohne Matratze; die Modellmaße sind nicht bestätigt.';
  }else if(o.id==='ottoman')o.method='Nur ein grob ähnliches Vergleichsangebot. Daraus wird keine Preisspanne berechnet; der Ottoman bleibt außerhalb der bewerteten Teilsumme.';
  else if(o.id==='chair')o.method='Zwei allgemeine Stuhlvergleiche zur Orientierung. Die visuelle Übereinstimmung zum Modell ist unzureichend bestätigt; deshalb bleibt der Stuhl unbewertet.';
 }
