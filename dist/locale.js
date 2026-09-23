@@ -112,3 +112,6 @@ for(const [id,copy] of Object.entries({
 }))Object.assign(objectCopy.de[id],copy);
 Object.assign(translations.en,{unitPiece:'per piece',unitListing:'per listing',unitPairSet:'per pair / set',unitVase:'per vase',unitFixture:'per fixture',unitPlantPot:'per plant + pot'});
 Object.assign(translations.de,{unitPiece:'je Stück',unitListing:'je Anzeige',unitPairSet:'je Paar / Set',unitVase:'je Vase',unitFixture:'je Leuchte',unitPlantPot:'je Pflanze + Topf'});
+
+Object.assign(translations.en,{showGroups:'Show object list · {n} groups',hideGroups:'Hide object list'});
+Object.assign(translations.de,{showGroups:'Objektliste anzeigen · {n} Gruppen',hideGroups:'Objektliste ausblenden'});

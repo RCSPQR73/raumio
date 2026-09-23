@@ -674,3 +674,32 @@ body { background: var(--bg); color: var(--text); }
   .inventory-entry > details.row-source > summary { min-height: 42px; padding: 7px 14px; }
   .inventory-entry > details.row-source > button { width: calc(100% - 28px); margin: 0 14px 11px; }
 }
+
+.inventory-top { align-items: center; gap: 14px; }
+.inventory-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 40px;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #506854;
+  border-radius: 7px;
+  background: #20382a;
+  color: #d5e8d7;
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+}
+.inventory-toggle span { color: #b7d0bc; font-size: 16px; line-height: 1; }
+.inventory-toggle:hover { background: #294533; }
+.inventory-toggle:focus-visible { outline: 2px solid #d4ead6; outline-offset: 3px; }
+.inventory-content[hidden], #inventory-content[hidden] { display: none !important; }
+.inventory-controls { display: flex; justify-content: flex-end; padding: 0 22px 12px; }
+@media (max-width: 760px) {
+  .inventory-top { flex-wrap: wrap; }
+  .inventory-toggle { min-height: 38px; padding: 7px 10px; font-size: 10px; }
+  .inventory-controls { padding: 0 14px 10px; }
+}
