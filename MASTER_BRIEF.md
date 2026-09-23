@@ -51,9 +51,10 @@ Die Demo enthält:
 - invertierte vertikale Steuerung: Nach oben ziehen blickt nach oben.
 - Blicksteuerung per Maus, Touch und Pfeiltasten.
 - einen Fadenkreuz-/Retikel-Zustand, der zeigt, welches Modellteil anvisiert wird.
-- sechs manuell zugeordnete Objektgruppen.
+- zwölf manuell zugeordnete Modellgruppen.
 - Objektkarten für bestätigte, wahrscheinliche und offene Zuordnungen.
-- Beispielwerte aus recherchierten Kleinanzeigen-Angeboten.
+- 55 verlinkte Kleinanzeigen-Angebote und Vergleichskandidaten mit Preis, Einheit und Ähnlichkeitsgrenzen.
+- Preisorientierung für neun Kategorien in der bewerteten Teilsumme; Schreibtisch/Konsole wird separat angezeigt, zwei mehrdeutige Gruppen bleiben ohne Wertansatz.
 - Preis-An/Aus, Objektfilter und Quellen-Dialog.
 - eine Scan-Ablaufsimulation ohne Kamerazugriff.
 - eine Möbelvorschau über demselben Live-Raum mit Position, Drehung und zwei Beispielmöbeln. Die Vorschau ist noch nicht in die Quelldatei integriert.
@@ -74,12 +75,16 @@ Die Demo enthält:
 
 ### Objekt- und Wertlogik
 
-- Das Modell ist in sechs kuratierte Gruppen gegliedert.
+- Das Modell ist in zwölf kuratierte Gruppen gegliedert. Alle Gruppen haben konkrete Angebotslinks oder – bei offenen Identitäten – ausdrücklich als Kandidaten gekennzeichnete Referenzen.
 - Zwei Betten werden als zwei Stück gezählt.
 - Vergleichswerte verwenden transparente untere und obere Angebotspreise.
+- Neun Kategorien mit Preisorientierung ergeben derzeit eine Teilsumme von 347–487 € für zehn Stücke. Die Schreibtisch-/Konsolenspanne (20–60 € je Anzeige) wird wegen der zusammengefassten Modellgruppe nicht mitgerechnet.
+- Wandpaneel und TV/Wandobjekte bleiben ohne Wertansatz, weil ihre Funktion oder die Einzelteile nicht sicher aus dem Modell hervorgehen.
 - Nicht ausreichend belegte Kategorien bleiben offen.
 - Die Website zeigt klar, dass Angebotspreise keine garantierten Verkaufspreise sind.
 - Vergleichsquellen enthalten individuelle Links und Ähnlichkeitsgrenzen.
+- Vorhänge werden als Paar-/Setpreise, Pflanzen als Pflanze-mit-Topf und Leuchten als Stückpreise verglichen; Modellmaße und Stückzahlen sind teilweise offen.
+- Der Datenstand der erweiterten Recherche ist der 23.09.2026. Anzeigenlinks und Verfügbarkeit können sich ändern.
 
 ### Möbel ausprobieren
 
