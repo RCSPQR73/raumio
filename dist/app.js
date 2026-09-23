@@ -1,7 +1,7 @@
-import {objects,price,stateLabel,total,euro,marketLink} from './data.js?v=20260923j';
-import {initializeCamera} from './camera.js?v=20260923j';
-import {t,objectText,getLanguage,initLanguage,onLanguageChange,setLanguage} from './locale.js?v=20260923j';
-import {createPlacement} from './placement.js?v=20260923j';
+import {objects,price,stateLabel,total,euro,marketLink} from './data.js?v=20260923k';
+import {initializeCamera} from './camera.js?v=20260923k';
+import {t,objectText,getLanguage,initLanguage,onLanguageChange,setLanguage} from './locale.js?v=20260923k';
+import {createPlacement} from './placement.js?v=20260923k';
 const $=s=>document.querySelector(s);let selected=0,focused=null,mode='explore',showPrices=true,placement=null,scanTimer=null,scanStep=0,toastTimer;window.__raumioShowPrices=true;
 function applyObjectLanguage(){for(const o of objects){for(const key of ['name','detail','reason'])o[key]=objectText(o.id,key);}}
 function notify(message){$('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3500);}

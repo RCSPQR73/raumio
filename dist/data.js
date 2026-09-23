@@ -1,5 +1,5 @@
-import {comparisons} from './comparables.js?v=20260923j';
-import {t} from './locale.js?v=20260923j';
+import {comparisons} from './comparables.js?v=20260923k';
+import {t} from './locale.js?v=20260923k';
 export const objects = [
  {id:'bed',name:'Polsterbetten',quantity:2,detail:'Zwei Betten · Gepolstertes Kopfteil',min:null,max:null,state:'safe',platform:'Kleinanzeigen',reason:'Kategorie im 3D-Modell bestätigt. Hersteller, Breite und Material sind nicht belegt.',query:'Polsterbett 90x200 grau',nodes:[3,4,5,22,23,24],anchor:[-11.9533,16.05,.65],icon:'bed',comparables:[]},
  {id:'nightstand',name:'Nachttisch',quantity:1,detail:'Holzoptik · Schubladen',min:null,max:null,state:'safe',platform:'Kleinanzeigen',reason:'Nachttisch im Modell eindeutig. Das Holz und der Hersteller sind nicht bestätigt.',query:'Nachttisch Holz Schubladen',nodes:[41,42,43],anchor:[-10.2533,16.831,.55],icon:'table',comparables:[]},

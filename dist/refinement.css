@@ -575,3 +575,51 @@ body { background: var(--bg); color: var(--text); }
 .source-discovery a { display: inline-flex; align-items: center; justify-content: center; min-height: 37px; padding: 8px 12px; border: 1px solid #c8cfc5; border-radius: 7px; color: #254d4a; background: #f5f1e9; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .source-discovery a:hover { background: #ead8c2; }
 @media (max-width: 560px) { .source-discovery > div { flex-basis: 100%; } .source-discovery a { flex: 1; } }
+
+/* Mobile pass: protect the 3D focus area and make controls comfortable to tap. */
+@media (max-width: 760px) {
+  .header { min-height: 68px; }
+  .header .button.small { min-height: 42px; }
+  .hero-bottom { overflow: hidden; }
+  .hero-bottom > span:first-child { flex-wrap: wrap; row-gap: 7px; }
+
+  .mode-tabs button { min-height: 44px; }
+  .viewer { height: min(540px, 68svh); min-height: 440px; }
+  .viewer:not(.placing) .object-card {
+    left: 10px; right: 10px; bottom: 10px; width: auto; max-height: 158px;
+    display: grid; grid-template-columns: minmax(0,1fr) auto;
+    grid-template-areas: 'status status' 'name price' 'detail detail' 'count action';
+    align-content: start; align-items: center; gap: 4px 12px; overflow: hidden;
+    padding: 10px 12px; border-radius: 10px;
+  }
+  .viewer:not(.placing) .object-card .demo-focus { display: none; }
+  .viewer:not(.placing) .object-card .confidence { grid-area: status; justify-self: start; margin: 0; }
+  .viewer:not(.placing) .object-card h3 { grid-area: name; min-width: 0; margin: 0; font-size: 17px; line-height: 1.2; }
+  .viewer:not(.placing) .object-card .object-price { grid-area: price; margin: 0; font-size: 24px; line-height: 1.1; white-space: nowrap; }
+  .viewer:not(.placing) .object-card > p:first-of-type { grid-area: detail; margin: 0; font-size: 11px; line-height: 1.35; }
+  .viewer:not(.placing) .object-card > p:nth-of-type(n+2) { display: none; }
+  .viewer:not(.placing) .object-card .source-count { grid-area: count; min-width: 0; margin: 0; font-size: 9px; line-height: 1.25; }
+  .viewer:not(.placing) .object-card .sources-button { grid-area: action; min-height: 40px; margin: 0; padding: 7px 10px; font-size: 10px; white-space: nowrap; }
+  .viewer:not(.placing) .object-card.empty { display: block; max-height: none; padding: 12px; }
+  .viewer:not(.placing) .object-card.empty .demo-focus { display: block; margin: 0 0 5px; }
+  .viewer:not(.placing) .object-card.empty .focus-empty { font-size: 12px; line-height: 1.45; }
+  .viewer:not(.placing) .look-controls { bottom: 171px; left: 10px; }
+  .viewer:not(.placing) .look-controls button { width: 34px; height: 34px; }
+  .viewer:not(.placing) .viewer-hint { top: 98px; max-width: calc(100% - 20px); }
+  .workspace-bottom { padding: 9px 12px; gap: 8px; }
+  .workspace-bottom .icon-button { width: 40px; height: 40px; }
+
+  .inventory-row { min-height: 72px; }
+  .row-source { min-height: 40px; }
+  .filter-label select { min-height: 42px; }
+  .scan-simulation .button, .placement-copy .button, .placement-copy .text-button { min-height: 44px; }
+  #placement-controls .range-field input { height: 32px; touch-action: pan-x; }
+  .faq-list summary { min-height: 44px; display: flex; align-items: center; }
+}
+
+@media (max-width: 380px) {
+  .viewer:not(.placing) .object-card { grid-template-columns: minmax(0,1fr) auto; gap: 3px 8px; }
+  .viewer:not(.placing) .object-card .object-price { font-size: 21px; }
+  .viewer:not(.placing) .object-card .sources-button { font-size: 9px; padding-inline: 7px; }
+  .hero h1 { font-size: clamp(34px, 9.2vw, 54px); }
+}
