@@ -733,3 +733,7 @@ body { background: var(--bg); color: var(--text); }
   .inventory-toggle { min-height: 38px; padding: 7px 10px; font-size: 10px; }
   .inventory-controls { padding: 0 14px 10px; }
 }
+
+.placement-zone-label { display: inline-flex; align-items: center; min-height: 28px; padding: 5px 9px; border-radius: 999px; background: #e5efe4; color: #42624b; font-size: 10px; line-height: 1.4; }
+.placement-zone-label.is-adjusted { background: #f0e5d8; color: #855a33; }
+.placement-demo-size { white-space: nowrap; }
