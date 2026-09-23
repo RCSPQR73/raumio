@@ -561,6 +561,36 @@ body { background: var(--bg); color: var(--text); }
   .hero-visual img { object-position: center 55%; }
 }
 
+/* Context-aware furniture choices, highlighted placement areas and the new pouf metadata. */
+#placement-controls .placement-zone-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 9px;
+  padding: 5px 8px;
+  border: 1px solid #b8d2bd;
+  border-radius: 999px;
+  background: #eaf3e8;
+  color: #42644c;
+  font-size: 10px;
+  line-height: 1.25;
+  width: fit-content;
+}
+#placement-controls .placement-extra { align-items: flex-start; }
+#placement-controls .furniture-choices { flex-wrap: wrap; }
+#placement-controls .furniture-choices button { min-width: 90px; }
+#placement-controls .furniture-choices button.active { background: #d8eadb; border-color: #83a98c; }
+#placement-controls .placement-product-meta { display: flex; flex-direction: column; gap: 4px; }
+#placement-controls .placement-demo-price { font-size: 12px; font-weight: 600; }
+#placement-controls .placement-demo-size { color: #66786c; font-size: 10px; white-space: nowrap; }
+@media (max-width: 760px) {
+  #placement-controls .placement-extra { align-items: stretch; }
+  #placement-controls .furniture-choices { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); width: 100%; }
+  #placement-controls .furniture-choices button { min-width: 0; padding-inline: 5px; font-size: 10px; }
+  #placement-controls .placement-product-meta { flex-direction: row; align-items: baseline; justify-content: space-between; }
+  #placement-controls .placement-shop-note { max-width: none; }
+}
+
 /* Research drawer: concrete comparisons first, current marketplace searches second. */
 .source-dialog { background: #f5f1e9; color: var(--ink); border-color: #cfc9bd; box-shadow: 0 30px 90px #07131366; }
 .source-dialog .source-method { background: #e6d8c6; color: #3e5148; }
