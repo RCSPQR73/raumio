@@ -560,3 +560,18 @@ body { background: var(--bg); color: var(--text); }
   .hero-visual { width: 100%; height: 310px; margin-top: 25px; }
   .hero-visual img { object-position: center 55%; }
 }
+
+/* Research drawer: concrete comparisons first, current marketplace searches second. */
+.source-dialog { background: #f5f1e9; color: var(--ink); border-color: #cfc9bd; box-shadow: 0 30px 90px #07131366; }
+.source-dialog .source-method { background: #e6d8c6; color: #3e5148; }
+.source-dialog .source-list li { border-color: #d9ddd4; }
+.source-dialog .source-list a { color: #285a58; }
+.source-dialog .source-list strong { color: var(--ink); }
+.source-dialog p,.source-dialog .source-list p { color: #576b67; }
+.source-discovery { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 18px; padding: 18px; border: 1px solid #d4d9ce; border-radius: 11px; background: #fffdfa; }
+.source-discovery > div { flex: 1 1 190px; }
+.source-discovery strong { font-size: 14px; }
+.source-discovery p { margin: 4px 0 0; font-size: 12px; }
+.source-discovery a { display: inline-flex; align-items: center; justify-content: center; min-height: 37px; padding: 8px 12px; border: 1px solid #c8cfc5; border-radius: 7px; color: #254d4a; background: #f5f1e9; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.source-discovery a:hover { background: #ead8c2; }
+@media (max-width: 560px) { .source-discovery > div { flex-basis: 100%; } .source-discovery a { flex: 1; } }
