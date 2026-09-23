@@ -11,7 +11,8 @@ export function initializeCamera(objects,onFocus,onStatus){
  let api=null,yaw=2.05,pitch=-.28,frame=0,active=true,drag=null,pickSequence=0,pickTimer=null,lastId=undefined,locked=false,requestCount=0;
  let pendingFocus=0,placementMode=false;
  const readyWaiters=[];
- const hiddenForPlacement=[195,214,228,247,266,285,299,567,663,682];
+ // Clear the upholstered silver bench from the bed-foot area so the preview has usable floor space.
+ const hiddenForPlacement=[195,214,228,247,266,285,299,402,403,404,567,663,682];
  const whenReady=()=>api?Promise.resolve(api):new Promise((resolve,reject)=>readyWaiters.push({resolve,reject}));
  const focusWaiters=new Set();
  const nodeIds=new Map();for(const o of objects)for(const id of o.nodes??[])nodeIds.set(id,o.id);

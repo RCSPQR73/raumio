@@ -1,15 +1,15 @@
 import * as THREE from './vendor/three.module.js';
-import {furniture,euro} from './data.js?v=20260923s';
-import {t} from './locale.js?v=20260923s';
+import {furniture,euro} from './data.js?v=20260923u';
+import {t} from './locale.js?v=20260923u';
 
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const BASE={x:-10.2,y:14.0};
 // Slider coordinates are metres relative to the aligned room-plan origin.
 // The bounded areas keep each sample on a plausible, unobstructed part of the floor.
 const ZONES={
- chair:{x:[-.98,-.18],z:[-.08,.58],label:'placementZoneChair'},
- table:{x:[.22,.96],z:[-.05,.52],label:'placementZoneTable'},
- pouf:{x:[-.48,.48],z:[-.88,-.30],label:'placementZonePouf'}
+ chair:{x:[-1.12,-.05],z:[-.18,.78],label:'placementZoneChair'},
+ table:{x:[.12,1.24],z:[-.16,.72],label:'placementZoneTable'},
+ pouf:{x:[-.92,.92],z:[-1.20,.08],label:'placementZonePouf'}
 };
 const NAME_KEYS={chair:'placementChairName',table:'placementTableName',pouf:'placementPoufName'};
 
@@ -18,8 +18,8 @@ export function createPlacement(stage,controlsHost,notify){
  controlsHost.innerHTML=`<div class="placement-panel" aria-label="Place furniture">
    <div class="placement-identity"><span class="placement-kicker"></span><h3 class="placement-name"></h3><p class="placement-explanation"></p><span class="placement-zone-label" aria-live="polite"></span></div>
    <div class="placement-fields">
-     <div class="range-field"><label for="furniture-x"><span class="axis-x"></span><output id="furniture-x-value">0.00 m</output></label><input type="range" min="-.98" max="-.18" step=".02" value="-.58" id="furniture-x"></div>
-     <div class="range-field"><label for="furniture-z"><span class="axis-z"></span><output id="furniture-z-value">0.00 m</output></label><input type="range" min="-.08" max=".58" step=".02" value=".25" id="furniture-z"></div>
+     <div class="range-field"><label for="furniture-x"><span class="axis-x"></span><output id="furniture-x-value">0.00 m</output></label><input type="range" min="-1.12" max="-.05" step=".02" value="-.59" id="furniture-x"></div>
+     <div class="range-field"><label for="furniture-z"><span class="axis-z"></span><output id="furniture-z-value">0.00 m</output></label><input type="range" min="-.18" max=".78" step=".02" value=".30" id="furniture-z"></div>
      <div class="range-field"><label for="furniture-rotation"><span class="axis-rotation"></span><output id="furniture-rotation-value">0°</output></label><input type="range" min="-180" max="180" step="5" value="0" id="furniture-rotation"></div>
    </div>
    <div class="placement-actions"><button id="animate-furniture" type="button"></button><button id="reset-furniture" type="button"></button></div>
@@ -132,7 +132,7 @@ export function createPlacement(stage,controlsHost,notify){
   raf=requestAnimationFrame(tick);
  };
  Object.values(controls).forEach(input=>input.addEventListener('input',()=>{stop();update();}));
- controlsHost.querySelectorAll('[data-furniture]').forEach(button=>button.addEventListener('click',()=>{stop();kind=button.dataset.furniture;setZone();rebuild();update();}));
+ controlsHost.querySelectorAll('[data-furniture]').forEach(button=>button.addEventListener('click',()=>{stop();kind=button.dataset.furniture;setZone();controls.x.value=String((ZONES[kind].x[0]+ZONES[kind].x[1])/2);controls.z.value=String((ZONES[kind].z[0]+ZONES[kind].z[1])/2);controls.rotation.value='0';rebuild();update();}));
  controlsHost.querySelector('#animate-furniture').addEventListener('click',play);
  controlsHost.querySelector('#reset-furniture').addEventListener('click',()=>{stop();controls.x.value=String((ZONES[kind].x[0]+ZONES[kind].x[1])/2);controls.z.value=String((ZONES[kind].z[0]+ZONES[kind].z[1])/2);controls.rotation.value='0';update();notify(t('resetDone'));});
  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2(),floor=new THREE.Plane(new THREE.Vector3(0,0,1),0),point=new THREE.Vector3();
