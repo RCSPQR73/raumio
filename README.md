@@ -43,7 +43,7 @@ Die zusätzliche Möbeldatei fehlt noch. Sie kann später die erzeugte Beispielg
 - `dist/index.html`: Landingpage, Funktionsbeschreibungen, FAQ und Dialogstruktur.
 - `dist/styles.css`: Basis- und Interaktionslayouts.
 - `dist/design.css`: überarbeitete Markenwelt mit dunklem Einstieg und hellen redaktionellen Abschnitten.
-- `dist/assets/lounge-editorial.jpg`: KI-generierte, explizit illustrative Einrichtungsinspiration.
+- `dist/assets/lounge-editorial.jpg`: frühere, derzeit nicht verwendete illustrative Einrichtungsstudie. Hero und Möbelvorschau zeigen jetzt denselben Originalraum wie die 3D-Demo.
 - `dist/app.js`: gemeinsamer UI-Zustand, Quellen, Übersicht, Scan-Simulation, WebMCP.
 - `dist/camera.js`: kalibrierte Kamera und Strahlprüfung.
 - `dist/data.js`: Objektgruppen, Mesh-Zuordnung, Stückzahlen und Berechnung.
