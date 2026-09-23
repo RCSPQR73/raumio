@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
-import {furniture,objects,euro} from './data.js?v=20260923ad';
-import {t} from './locale.js?v=20260923ad';
-import {CLEARANCE,FOOTPRINTS,isValidPlacement,nearestValidPlacement,validateMeshPlacement} from './placement-geometry.mjs?v=20260923ad';
+import {furniture,objects,euro} from './data.js?v=20260923ae';
+import {t} from './locale.js?v=20260923ae';
+import {CLEARANCE,FOOTPRINTS,isValidPlacement,nearestValidPlacement,validateMeshPlacement} from './placement-geometry.mjs?v=20260923ae';
 
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const BASE={x:-10.2,y:14.0};
@@ -60,13 +60,13 @@ export function createPlacement(stage,controlsHost,notify){
   const shape=new THREE.Shape();shape.moveTo(-w,-d);shape.lineTo(w,-d);shape.lineTo(w,d);shape.lineTo(-w,d);shape.closePath();
   footprintFillMaterial=new THREE.MeshBasicMaterial({color:'#7fbd94',transparent:true,opacity:.19,depthWrite:false,side:THREE.DoubleSide});footprintFill=new THREE.Mesh(new THREE.ShapeGeometry(shape),footprintFillMaterial);footprintFill.position.z=.012;footprintFill.renderOrder=2;footprintGroup.add(footprintFill);
   footprintOutlineMaterial=new THREE.MeshBasicMaterial({color:'#7fbd94',transparent:true,opacity:.96,depthWrite:false});footprintOutline=new THREE.Group();footprintOutline.renderOrder=4;
-  for(const [edgeWidth,edgeDepth,edgeX,edgeY] of [[w*2+.018,.018,0,-d],[w*2+.018,.018,0,d],[.018,d*2+.018,-w,0],[.018,d*2+.018,w,0]]){const edge=new THREE.Mesh(new THREE.BoxGeometry(edgeWidth,edgeDepth,.006),footprintOutlineMaterial);edge.position.set(edgeX,edgeY,.019);footprintOutline.add(edge);}
+  for(const [edgeWidth,edgeDepth,edgeX,edgeY] of [[w*2+.025,.025,0,-d],[w*2+.025,.025,0,d],[.025,d*2+.025,-w,0],[.025,d*2+.025,w,0]]){const edge=new THREE.Mesh(new THREE.BoxGeometry(edgeWidth,edgeDepth,.008),footprintOutlineMaterial);edge.position.set(edgeX,edgeY,.024);footprintOutline.add(edge);}
   footprintGroup.add(footprintOutline);
  };
  const setFootprint=(x,z,rotation,state='checking')=>{
-  const colors={checking:'#d8b578',clear:'#7fbd94',blocked:'#d88976',unavailable:'#a7b1aa'};
+  const colors={checking:'#edbd61',clear:'#8dd6a0',blocked:'#ff665a',unavailable:'#a7b1aa'};
   const color=colors[state]??colors.checking;footprintGroup.position.set(BASE.x+x,BASE.y-z,.008);footprintGroup.rotation.z=rotation*Math.PI/180;footprintGroup.visible=active;
-  if(footprintFillMaterial){footprintFillMaterial.color.set(color);footprintFillMaterial.opacity=state==='blocked'?.24:.16;footprintOutlineMaterial.color.set(color);footprintOutlineMaterial.opacity=state==='blocked'?1:.92;}
+  if(footprintFillMaterial){footprintFillMaterial.color.set(color);footprintFillMaterial.opacity=state==='blocked'?.38:.2;footprintOutlineMaterial.color.set(color);footprintOutlineMaterial.opacity=state==='blocked'?1:.98;}
  };
  const setZone=()=>{
   for(const axis of ['x','z']){controls[axis].min=String(bounds[axis][0]);controls[axis].max=String(bounds[axis][1]);controls[axis].step='.02';}
