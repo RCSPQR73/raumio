@@ -16,6 +16,24 @@ export function initializeCamera(objects,onFocus,onStatus){
  const whenReady=()=>api?Promise.resolve(api):new Promise((resolve,reject)=>readyWaiters.push({resolve,reject}));
  const focusWaiters=new Set();
  const nodeIds=new Map();for(const o of objects)for(const id of o.nodes??[])nodeIds.set(id,o.id);
+ const sceneRay=(start,end)=>new Promise((resolve,reject)=>{
+  if(!api)return reject(new Error('3D room unavailable'));
+  const timeout=setTimeout(()=>reject(new Error('Room mesh ray timed out')),1800);
+  api.pickFromScene(start,end,(err,hit)=>{clearTimeout(timeout);if(err)reject(err);else resolve(hit??null);});
+ });
+ const samplePlacementFloor=async(x,y)=>{
+  // The placement planner is a top-down overlay in the model's world space
+  // (Sketchfab asset uses Z-up). A vertical mesh ray tests the real room mesh.
+  try{
+   const hit=await sceneRay([x,y,3.5],[x,y,-1]);
+   if(!hit)return{floor:false,reason:'no-surface'};
+   const point=hit.position3D??hit.position??hit.coord?.position3D;
+   const normal=hit.normal??hit.coord?.normal;
+   if(!Array.isArray(point)||point.length<3)return{floor:false,reason:'no-position',instanceID:hit.instanceID??null};
+   const height=Number(point[2]),vertical=Math.abs(Number(normal?.[2]??0));
+   return{floor:Number.isFinite(height)&&height<=.10&&vertical>=.62,height,vertical,instanceID:hit.instanceID??null};
+  }catch(error){return{floor:false,reason:/timed out/i.test(String(error))?'timeout':'ray-error'};}
+ };
  function project(id){marker.hidden=!api||!id;}
  function emit(id){if(id!==lastId){lastId=id;onFocus(id);for(const done of focusWaiters)done(id);focusWaiters.clear();}project(id);}
  function pick(){if(!api||!active||document.hidden||locked)return;const sequence=++pickSequence;const direction=directionFor(yaw,pitch);const end=FIXED_EYE.map((v,i)=>v+direction[i]*60);api.pickFromScene([...FIXED_EYE],end,(err,hit)=>{if(sequence!==pickSequence||!active)return;if(err){emit(null);return;}const id=hit?.instanceID;emit(nodeIds.get(id)??null);});}
@@ -31,5 +49,5 @@ export function initializeCamera(objects,onFocus,onStatus){
  api.addEventListener('camerastop',()=>{if(!active)return;api.getCameraLookAt((err,view)=>{if(!err){viewer.dataset.cameraObservedPosition=view.position.join(',');viewer.dataset.cameraObservedTarget=view.target.join(',');}if(!err&&view.position.some((v,i)=>Math.abs(v-FIXED_EYE[i])>.001))queue();});});
  });},error(){clearTimeout(watchdog);for(const waiter of readyWaiters)waiter.reject(new Error('3D room unavailable'));readyWaiters.length=0;onStatus('error');}});
  };sdk.onerror=()=>{clearTimeout(watchdog);for(const waiter of readyWaiters)waiter.reject(new Error('3D room unavailable'));readyWaiters.length=0;onStatus('error');};document.head.append(sdk);
- return{focus,async enterPlacement(){await whenReady();if(placementMode)return;placementMode=true;for(const id of hiddenForPlacement)api.hide(id);api.setCameraLookAt([-10.2,13.1,6.4],[-10.2,14.35,0],0);},exitPlacement(){if(!api||!placementMode)return;placementMode=false;for(const id of hiddenForPlacement)api.show(id);queue();},focusAndWait(index){if(!api)return Promise.reject(new Error(t('cameraNotReady')));return new Promise(resolve=>{const done=id=>{clearTimeout(timeout);resolve(id);};const timeout=setTimeout(()=>{focusWaiters.delete(done);resolve(lastId??null);},2500);focusWaiters.add(done);focus(index);});},setActive(value){active=value;surface.hidden=!value;controls.hidden=!value;marker.hidden=!value||!lastId;if(value){queue();pick();}else{pickSequence++;}},setLocked(value){locked=value;},dispose(){clearTimeout(watchdog);clearInterval(pickTimer);cancelAnimationFrame(frame);marker.remove();}};
+ return{focus,async enterPlacement(){await whenReady();if(placementMode)return;placementMode=true;for(const id of hiddenForPlacement)api.hide(id);api.setCameraLookAt([-10.2,13.1,6.4],[-10.2,14.35,0],0);},samplePlacementFloor,exitPlacement(){if(!api||!placementMode)return;placementMode=false;for(const id of hiddenForPlacement)api.show(id);queue();},focusAndWait(index){if(!api)return Promise.reject(new Error(t('cameraNotReady')));return new Promise(resolve=>{const done=id=>{clearTimeout(timeout);resolve(id);};const timeout=setTimeout(()=>{focusWaiters.delete(done);resolve(lastId??null);},2500);focusWaiters.add(done);focus(index);});},setActive(value){active=value;surface.hidden=!value;controls.hidden=!value;marker.hidden=!value||!lastId;if(value){queue();pick();}else{pickSequence++;}},setLocked(value){locked=value;},dispose(){clearTimeout(watchdog);clearInterval(pickTimer);cancelAnimationFrame(frame);marker.remove();}};
 }

@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
-import {furniture,euro} from './data.js?v=20260923v';
-import {t} from './locale.js?v=20260923v';
-import {FLOOR,OBSTACLES,isValidPlacement,nearestValidPlacement} from './placement-geometry.mjs?v=20260923v';
+import {furniture,euro} from './data.js?v=20260923x';
+import {t} from './locale.js?v=20260923x';
+import {buildMeshFloorMap,meshFloorPolygons,isMeshPlacementValid,nearestValidPlacement} from './placement-geometry.mjs?v=20260923x';
 
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const BASE={x:-10.2,y:14.0};
@@ -21,7 +21,7 @@ export function createPlacement(stage,controlsHost,notify){
  </div>`;
  const canvas=stage.querySelector('#placement-canvas');
  const controls={x:controlsHost.querySelector('#furniture-x'),z:controlsHost.querySelector('#furniture-z'),rotation:controlsHost.querySelector('#furniture-rotation')};
- let active=false,animation=0,raf=0,kind='chair',drag=null,renderer,lastValid={x:-.55,z:.05},
+ let active=false,animation=0,raf=0,kind='chair',drag=null,renderer,lastValid={x:-.55,z:.05},meshMap=null,scanSequence=0,meshRequired=false,
      bounds={x:[-4.05,3.55],z:[-3.65,2.85]};
  try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,premultipliedAlpha:false});}
  catch{canvas.insertAdjacentHTML('beforeend',`<div class="placement-failure">${t('webgl')}</div>`);controlsHost.querySelectorAll('button,input').forEach(control=>control.disabled=true);return{play(){notify(t('webglToast'));},stop(){},setLanguage(){},setActive(){},dispose(){}};}
@@ -45,8 +45,6 @@ export function createPlacement(stage,controlsHost,notify){
  const shadowMaterial=new THREE.MeshBasicMaterial({color:'#17241d',transparent:true,opacity:.17,depthWrite:false});
  const shadow=new THREE.Mesh(new THREE.CircleGeometry(.52,48),shadowMaterial);shadow.position.z=.025;scene.add(shadow);
  const zoneFill=new THREE.MeshBasicMaterial({color:'#a8d8ac',transparent:true,opacity:.13,depthWrite:false,side:THREE.DoubleSide});
- const obstacleFill=new THREE.MeshBasicMaterial({color:'#5e554c',transparent:true,opacity:.34,depthWrite:false,side:THREE.DoubleSide});
- const zoneLine=new THREE.LineBasicMaterial({color:'#dcf3dc',transparent:true,opacity:.8});
  const zoneGroup=new THREE.Group();scene.add(zoneGroup);
  const roundedPrism=(w,d,h,r,x,y,z,material)=>{
   const shape=new THREE.Shape(),q=Math.min(r,w/2,d/2);shape.moveTo(-w/2+q,-d/2);shape.lineTo(w/2-q,-d/2);shape.absarc(w/2-q,-d/2+q,q,-Math.PI/2,0,false);shape.lineTo(w/2,d/2-q);shape.absarc(w/2-q,d/2-q,q,0,Math.PI/2,false);shape.lineTo(-w/2+q,d/2);shape.absarc(-w/2+q,d/2-q,q,Math.PI/2,Math.PI,false);shape.lineTo(-w/2,-d/2+q);shape.absarc(-w/2+q,-d/2+q,q,Math.PI,Math.PI*1.5,false);
@@ -57,18 +55,16 @@ export function createPlacement(stage,controlsHost,notify){
  const leg=(x,y,height,radius,material)=>{const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radius*.62,radius,height,16),material);mesh.rotation.x=Math.PI/2;mesh.position.set(x,y,height/2+.018);mesh.castShadow=true;mesh.receiveShadow=true;object.add(mesh);return mesh;};
  const cylinder=(radiusTop,radiusBottom,height,segments,x,y,z,material)=>{const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radiusTop,radiusBottom,height,segments),material);mesh.rotation.x=Math.PI/2;mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;object.add(mesh);return mesh;};
  const disposeGroup=group=>{for(const child of [...group.children]){group.remove(child);child.geometry?.dispose();}};
- const worldPolygon=polygon=>polygon.map(([x,z])=>[BASE.x+x,BASE.y-z]);
- const addPlanPolygon=(polygon,material,depth)=>{
-  const points=worldPolygon(polygon),shape=new THREE.Shape();shape.moveTo(points[0][0],points[0][1]);
-  for(const [x,y] of points.slice(1))shape.lineTo(x,y);shape.closePath();
-  const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),material);mesh.position.z=depth;mesh.renderOrder=depth>.02?4:2;zoneGroup.add(mesh);
-  const line=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(points.map(([x,y])=>new THREE.Vector3(x,y,depth+.01))),zoneLine);line.renderOrder=5;zoneGroup.add(line);
- };
  const setZone=()=>{
   for(const axis of ['x','z']){controls[axis].min=String(bounds[axis][0]);controls[axis].max=String(bounds[axis][1]);controls[axis].step='.02';}
-  disposeGroup(zoneGroup);addPlanPolygon(FLOOR,zoneFill,.012);
-  OBSTACLES.forEach(({polygon})=>addPlanPolygon(polygon,obstacleFill,.02));
-  controlsHost.querySelector('.placement-zone-label').textContent=`✓ ${t('placementZonePrefix')} · ${t('placementClearance')}`;
+  disposeGroup(zoneGroup);
+  if(meshMap){
+   const polygons=meshFloorPolygons(meshMap),positions=[],indices=[];
+   for(const polygon of polygons){const base=positions.length/3;for(const [x,z] of polygon){positions.push(BASE.x+x,BASE.y-z,.012);}indices.push(base,base+1,base+2,base,base+2,base+3);}
+   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setIndex(indices);geometry.computeVertexNormals();
+   const floorMesh=new THREE.Mesh(geometry,zoneFill);floorMesh.renderOrder=3;zoneGroup.add(floorMesh);
+  }
+  controlsHost.querySelector('.placement-zone-label').textContent=meshMap?`✓ ${t('placementMeshReady')}`:t('placementMeshScanning');
  };
  const makePouf=()=>{
   // Tailored low pouf with a recessed wood base, shaped upholstery and fine welt.
@@ -125,16 +121,44 @@ export function createPlacement(stage,controlsHost,notify){
  const render=()=>renderer.render(scene,camera);
  const update=()=>{
   const rotation=Number(controls.rotation.value),requested={x:clamp(Number(controls.x.value),...bounds.x),z:clamp(Number(controls.z.value),...bounds.z)};
-  const snapped=nearestValidPlacement(kind,requested.x,requested.z,rotation,lastValid)||lastValid;
+  const snapped=meshRequired&&!meshMap?lastValid:(nearestValidPlacement(kind,requested.x,requested.z,rotation,lastValid,meshMap)||lastValid);
   const changed=Math.hypot(snapped.x-requested.x,snapped.z-requested.z)>.025;
   const x=snapped.x,z=snapped.z;controls.x.value=String(x);controls.z.value=String(z);
-  if(isValidPlacement(kind,x,z,rotation))lastValid={x,z};
+  const valid=meshRequired?Boolean(meshMap&&isMeshPlacementValid(kind,x,z,rotation,meshMap)===true):true;
+  object.visible=valid;
+  if(valid)lastValid={x,z};
   object.position.set(BASE.x+x,BASE.y-z,0);object.rotation.z=rotation*Math.PI/180;
   shadow.position.x=object.position.x;shadow.position.y=object.position.y;
   for(const key of ['x','z'])controlsHost.querySelector(`#furniture-${key}-value`).textContent=Number(controls[key].value).toLocaleString(document.documentElement.lang==='de'?'de-DE':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})+' m';
   controlsHost.querySelector('#furniture-rotation-value').textContent=rotation+'°';
-  const status=controlsHost.querySelector('.placement-zone-label');status.textContent=changed?t('placementSnapped'):t('placementClearance');status.classList.toggle('is-adjusted',changed);
+  const status=controlsHost.querySelector('.placement-zone-label');status.textContent=!meshMap?t('placementMeshScanning'):changed?t('placementSnapped'):t('placementClearance');status.classList.toggle('is-adjusted',changed||!meshMap);status.classList.toggle('is-mesh-ready',Boolean(meshMap));
   render();
+ };
+ const scanRoomMesh=async sample=>{
+  if(meshMap)return;
+  const sequence=++scanSequence;meshRequired=true;meshMap=null;setZone();update();
+  try{
+   const map=await buildMeshFloorMap(sample,{onProgress:(done,total)=>{
+    if(sequence!==scanSequence)return;
+    const status=controlsHost.querySelector('.placement-zone-label');
+    status.textContent=`${t('placementMeshScanning')} ${Math.round(done/total*100)}%`;
+   }});
+   if(sequence!==scanSequence)return;
+   const clear=map.cells.filter(cell=>cell.floor).length;
+   if(clear<25)throw new Error('Room floor mesh was not detected');
+   meshMap=map;setZone();
+   if(!isMeshPlacementValid(kind,Number(controls.x.value),Number(controls.z.value),Number(controls.rotation.value),meshMap)){
+    const nearest=nearestValidPlacement(kind,Number(controls.x.value),Number(controls.z.value),Number(controls.rotation.value),lastValid,meshMap);
+    if(nearest){controls.x.value=String(nearest.x);controls.z.value=String(nearest.z);lastValid=nearest;}
+   }
+   update();
+  }catch(error){
+   if(sequence!==scanSequence)return;
+   meshMap=null;setZone();update();
+   controlsHost.querySelector('.placement-zone-label').textContent=t('placementMeshUnavailable');
+   controlsHost.querySelector('.placement-zone-label').classList.add('is-adjusted');
+   notify(t('placementMeshUnavailable'));
+  }
  };
  const localize=()=>{
   stage.querySelector('.placement-badge').textContent=t('placementBadge');stage.querySelector('.placement-help').textContent=t('placementHelp');
@@ -165,5 +189,5 @@ export function createPlacement(stage,controlsHost,notify){
  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();stop();notify(t('graphicsPaused'));});
  const observer=new ResizeObserver(()=>{const width=canvas.clientWidth,height=canvas.clientHeight;if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();render();});observer.observe(canvas);
  localize();controls.x.value='0';controls.z.value='-.2';update();
- return{play,stop,setLanguage(){localize();update();},setActive(value){active=value;if(!value)stop();else render();},dispose(){stop();observer.disconnect();for(const mesh of object.children)mesh.geometry?.dispose();for(const material of object.userData.detailMaterials||[])material.dispose();disposeGroup(zoneGroup);cloth.dispose();cushionCloth.dispose();wood.dispose();woodLight.dispose();metal.dispose();poufFabric.dispose();poufTop.dispose();poufPiping.dispose();poufWood.dispose();zoneFill.dispose();obstacleFill.dispose();zoneLine.dispose();shadow.geometry.dispose();shadow.material.dispose();renderer.dispose();}};
+ return{play,stop,scanRoomMesh,setLanguage(){localize();update();},setActive(value){active=value;if(!value)stop();else render();},dispose(){scanSequence++;stop();observer.disconnect();for(const mesh of object.children)mesh.geometry?.dispose();for(const material of object.userData.detailMaterials||[])material.dispose();disposeGroup(zoneGroup);cloth.dispose();cushionCloth.dispose();wood.dispose();woodLight.dispose();metal.dispose();poufFabric.dispose();poufTop.dispose();poufPiping.dispose();poufWood.dispose();zoneFill.dispose();shadow.geometry.dispose();shadow.material.dispose();renderer.dispose();}};
 }
