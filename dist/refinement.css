@@ -741,3 +741,65 @@ body { background: var(--bg); color: var(--text); }
 #placement-controls .range-field label { color: #4d5b50; }
 .placement-zone-label.is-blocked { background: #fae8e3; border-color: #d69383 !important; color: #8f3c2f !important; }
 .placement-zone-label.is-adjusted:not(.is-blocked) { background: #f5eddd; border-color: #d7ba7d !important; color: #775b2d !important; }
+
+/* Keep the placement tools visually attached to the 3D workspace and readable on touch screens. */
+.viewer.placing .viewer-brand { display: none; }
+.viewer.placing #placement-stage .placement-badge,
+.viewer.placing #placement-stage .placement-help {
+  display: inline-flex !important; position: absolute; z-index: 7; align-items: center;
+  width: auto; max-width: calc(100% - 28px); border: 1px solid #b2c4b7a6;
+  border-radius: 9px; background: #14201ceb; color: #f1f4ed; backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px #06110b36; pointer-events: none;
+}
+.viewer.placing #placement-stage .placement-badge {
+  top: 16px; left: 16px; padding: 10px 13px; font-size: 11px; line-height: 1.3;
+  letter-spacing: .075em; font-weight: 650;
+}
+.viewer.placing #placement-stage .placement-help {
+  left: 50%; bottom: 36px; width: min(260px,calc(100% - 28px)); height: 112px;
+  transform: translateX(-50%); justify-content: center; text-align: center;
+  padding: 16px; font-size: 13px; line-height: 1.4; white-space: normal;
+}
+#placement-controls { background: #17211d; border-top: 1px solid #3a4e43; }
+#placement-controls .placement-panel {
+  color: #eff4ed; padding: 22px 25px; gap: 22px;
+}
+#placement-controls .placement-kicker { color: #d7a478; font-size: 11px; letter-spacing: .1em; }
+#placement-controls h3 { color: #f5f5ef; font-size: 25px; line-height: 1.15; }
+#placement-controls .placement-explanation { max-width: 390px; color: #bdc9c0; font-size: 14px; line-height: 1.55; }
+#placement-controls .range-field label { min-height: 28px; color: #d5ddd7; font-size: 13px; }
+#placement-controls .range-field output { color: #f1c49c; font-weight: 650; font-variant-numeric: tabular-nums; }
+#placement-controls .range-field input { min-height: 34px; accent-color: #c98c5f; }
+#placement-controls .placement-actions { gap: 9px; min-width: 122px; }
+#placement-controls .placement-actions button { min-height: 42px; border-radius: 8px; font-size: 13px; }
+#placement-controls .placement-actions button:first-child { background: #d99c6d; border-color: #d99c6d; color: #251b15; }
+#placement-controls .placement-actions button:last-child { background: #212e28; border-color: #516158; color: #e5ebe4; }
+#placement-controls .placement-extra { border-color: #394a40; }
+#placement-controls .furniture-choices button { min-height: 46px; border-radius: 9px; border-color: #58675e; background: #1d2924; color: #dce4dc; font-size: 14px; }
+#placement-controls .furniture-choices button.active { background: #3b3027; border-color: #c98c5f; color: #ffd8b5; }
+#placement-controls .placement-product-meta { color: #d6dfd7; font-size: 13px; }
+#placement-controls .placement-demo-price { color: #f0c29c; font-size: 16px; font-weight: 600; }
+#placement-controls .placement-shop-note { color: #aab9af; font-size: 12px; line-height: 1.6; }
+#placement-controls .placement-zone-label { display: flex; width: fit-content; max-width: 100%; min-height: 36px; padding: 7px 11px; border: 1px solid #698274; border-radius: 9px; background: #20352a; color: #d9eee0; font-size: 13px; line-height: 1.4; }
+#placement-controls .placement-zone-label.is-blocked { border-color: #b97d6b !important; background: #3b2723 !important; color: #ffd2c7 !important; }
+#placement-controls .placement-zone-label.is-adjusted:not(.is-blocked) { border-color: #b29562 !important; background: #392f21 !important; color: #f0d8a8 !important; }
+.viewer:not(.placing) .object-card { width: 248px; right: 18px; bottom: 18px; padding: 18px; }
+.viewer:not(.placing) .object-card h3 { font-size: 22px; }
+.viewer:not(.placing) .object-price { font-size: 33px; }
+@media (max-width: 1000px) {
+  #placement-controls .placement-panel { gap: 17px; padding: 20px; }
+  #placement-controls .placement-explanation { max-width: none; }
+}
+@media (max-width: 760px) {
+  .viewer.placing #placement-stage .placement-badge { top: 11px; left: 11px; padding: 8px 10px; font-size: 10px; }
+  .viewer.placing #placement-stage .placement-help { bottom: 30px; width: min(224px,calc(100% - 24px)); height: 104px; padding: 13px; font-size: 12px; }
+  #placement-controls .placement-panel { gap: 14px; padding: 18px 16px; }
+  #placement-controls h3 { font-size: 22px; }
+  #placement-controls .placement-explanation { font-size: 14px; }
+  #placement-controls .placement-fields { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 15px; }
+  #placement-controls .placement-fields .range-field:nth-child(3) { grid-column: 1 / -1; }
+  #placement-controls .range-field label { font-size: 13px; }
+  #placement-controls .placement-actions button { min-height: 44px; }
+  #placement-controls .placement-zone-label { font-size: 13px; }
+  .viewer:not(.placing) .object-card { width: auto; }
+}
