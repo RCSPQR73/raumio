@@ -42,7 +42,7 @@ Das Produkt soll dabei:
 
 Die Website ist eine hochwertige Konzeptdemo und Landingpage. Sie erklärt das Produkt, zeigt den vorgesehenen Ablauf und macht den wichtigsten Interaktionskern früh sichtbar: einen breiten 3D-Raumviewer mit festem Kamerastandpunkt.
 
-Die aktuelle Demo verwendet das eingebettete Sketchfab-Modell **Hotel Room + Hallway** von Rafael Rodrigues. Die Möbelplatzierung zeigt einen eigenständig aufgebauten 3D-Raumplan mit derselben erkennbaren Anordnung von Betten, Nachttisch, Leuchte und Schreibtisch, aber ohne Flur. Die Herkunft des Explore-Modells bleibt im Seitenfuß transparent angegeben. Das Modell wird nicht als eigenes Werk ausgegeben und darf nicht ohne passende Rechte heruntergeladen oder weiterverwendet werden.
+Die aktuelle Demo verwendet das eingebettete Sketchfab-Modell **Hotel Room + Hallway** von Rafael Rodrigues. Die Möbelplatzierung behält das live eingebettete Modell bei, zeigt das Zimmer von oben und blendet Decke sowie Flurteile per Viewer API aus. Ein separat gerendertes, ungefähr maßstäbliches Beispielmöbel liegt als interaktive Vorschau darüber. Die Herkunft des Explore-Modells bleibt im Seitenfuß transparent angegeben. Das Modell wird nicht als eigenes Werk ausgegeben und darf nicht ohne passende Rechte heruntergeladen oder weiterverwendet werden.
 
 Die Demo enthält:
 
@@ -56,7 +56,7 @@ Die Demo enthält:
 - Beispielwerte aus recherchierten Kleinanzeigen-Angeboten.
 - Preis-An/Aus, Objektfilter und Quellen-Dialog.
 - eine Scan-Ablaufsimulation ohne Kamerazugriff.
-- eine Platzierungsdemo als eigenständiger 3D-Nachbau des Hotelzimmer-Grundrisses mit Position, Drehung und Farbwahl. Sie ist keine geometrisch identische Kopie des Explore-Modells.
+- eine Möbelvorschau über demselben Live-Raum mit Position, Drehung und zwei Beispielmöbeln. Die Vorschau ist noch nicht in die Quelldatei integriert.
 - ein English/Deutsch-Sprachmodul; English ist bei einem neuen Besuch die Standardsprache.
 - Tests für Preisberechnung, Marktquellen, Kamerainvarianten und eindeutige Objektzuordnung.
 
@@ -85,7 +85,7 @@ Die Demo enthält:
 
 - Sessel und Beistelltisch sind als Demoobjekte vorhanden.
 - Position, Drehung und Farbe lassen sich ändern.
-- Die Platzierungsansicht bleibt im gleichen Raumkonzept und blendet den Flur aus.
+- Die Platzierungsansicht zeigt denselben Live-Raum aus der Draufsicht; Decke und Flurelemente werden über die Viewer API ausgeblendet.
 - Eine spätere zusätzliche 3D-Datei kann an dieser Stelle integriert werden.
 
 ### Sprache und Kommunikation
@@ -107,7 +107,7 @@ Diese Punkte müssen in jeder Produkt- und Investorendarstellung klar bleiben:
 - Hersteller, exakte Modellnummer, Zustand, Maße und Lieferumfang sind bei den Modellobjekten nicht verifiziert.
 - Der angezeigte Wert ist ein belegter Teilwert; ein vollständiger Raumwert wird nicht behauptet.
 - Die Platzierungsobjekte sind erzeugte Demo-Geometrien und noch nicht die später gelieferte zusätzliche Möbeldatei.
-- Die Platzierung ist noch keine maßhaltige gemeinsame Rekonstruktion des Originalraums.
+- Die Möbelvorschau ist visuell auf Kamera und ungefähren Maßstab des Originals abgestimmt, besitzt aber noch keine korrekte Verdeckung oder Kollision mit der Quelldatei.
 - Affiliate-Links und Provisionen sind noch nicht eingerichtet.
 - Nutzerkonten, Scan-Speicherung, Datenschutzverwaltung und Cloud-Synchronisation fehlen.
 

@@ -212,3 +212,42 @@ body { background: var(--bg); }
   .workspace-top { padding: 10px; }
   .inventory-row { padding-inline: 12px; }
 }
+
+/* The furniture editor operates the original Sketchfab scene, not a second renderer. */
+#placement-stage[hidden],#placement-controls[hidden]{display:none!important}
+.viewer.placing{height:clamp(510px,50vw,690px)}
+.viewer.placing #sketchfab{visibility:visible!important;opacity:1!important;pointer-events:none}
+#placement-stage{position:absolute;inset:0;z-index:5;display:block;background:transparent;pointer-events:none}
+#placement-canvas{position:absolute;inset:0;width:100%;height:100%;background:transparent!important;touch-action:none;pointer-events:auto;cursor:grab}
+#placement-canvas.dragging{cursor:grabbing}
+.placement-badge{top:20px;left:20px;border:1px solid #9fd3ad8c;background:#12251fcf;color:#e8f2e9;font-size:10px;letter-spacing:.1em;padding:10px 12px}
+.placement-help{bottom:22px;left:20px;border:1px solid #9fd3ad70;background:#12251fcf;color:#e8f2e9;font-size:11px;padding:9px 12px}
+#placement-controls{background:#17251f;border-top:1px solid #385142;padding:0}
+#placement-controls .placement-panel{background:transparent;display:grid;grid-template-columns:minmax(180px,1fr) minmax(380px,1.7fr) auto;align-items:center;gap:24px;border:0;padding:20px 25px;overflow:visible}
+.placement-identity{min-width:0}
+.placement-kicker{display:block;color:#a8cbb0;font-size:10px;letter-spacing:.12em;font-weight:600}
+#placement-controls h3{font-size:22px;margin:5px 0 4px;color:#f2f6f1;font-weight:500}
+.placement-explanation{font-size:11px;line-height:1.5;color:#b5c9bb;margin:0;max-width:350px}
+.placement-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+#placement-controls .range-field{min-width:0;margin:0}
+#placement-controls .range-field label{font-size:11px;color:#cadacc;gap:6px}
+#placement-controls .range-field input{height:22px;margin:6px 0 0;cursor:pointer}
+#placement-controls .placement-actions{display:flex;flex-direction:column;gap:7px;margin:0;min-width:110px}
+#placement-controls .placement-actions button{min-height:34px;border-radius:6px;font-size:11px;white-space:nowrap}
+#placement-controls .placement-shop-note{grid-column:1/-1;color:#8fa698;font-size:10px;margin:-12px 0 0;line-height:1.5}
+.placement-failure{position:absolute;inset:0;display:grid;place-items:center;color:white;background:#12251fd9;padding:25px;text-align:center}
+@media(max-width:1000px){#placement-controls .placement-panel{grid-template-columns:1fr auto;gap:14px}.placement-fields{grid-column:1/-1;grid-row:2}.placement-actions{grid-column:2;grid-row:1}.placement-shop-note{margin:0!important}}
+@media(max-width:760px){.viewer.placing{height:440px!important;min-height:0}#placement-stage{position:absolute;inset:0;display:block;grid-template-rows:none}#placement-canvas{position:absolute;inset:0}.placement-badge{left:11px;top:11px;font-size:8px}.placement-help{left:11px;bottom:11px;font-size:9px}#placement-controls .placement-panel{display:grid;grid-template-columns:1fr;gap:16px;padding:18px}.placement-fields{grid-column:1;grid-row:auto;display:grid;grid-template-columns:1fr;gap:12px}.placement-actions{grid-column:1!important;grid-row:auto!important;flex-direction:row!important}.placement-actions button{flex:1}.placement-shop-note{grid-column:1!important;font-size:10px}}
+.viewer.placing .viewer-brand{display:none}
+.placement-pin{position:absolute;z-index:3;width:42px;height:42px;display:grid;place-items:center;transform:translate(-50%,-50%);border:2px solid #efffed;border-radius:50%;background:#173423aa;color:white;box-shadow:0 0 0 4px #102c2299,0 6px 15px #00170c66;font:600 20px/1 system-ui;pointer-events:none;transition:left .08s linear,top .08s linear}
+.placement-pin[hidden]{display:none!important}
+#placement-canvas canvas{position:absolute;inset:0;display:block;width:100%;height:100%;background:transparent;cursor:grab;touch-action:none}
+#placement-canvas canvas.dragging{cursor:grabbing}
+#placement-controls .placement-extra{grid-column:1/-1;display:flex;align-items:center;gap:18px;flex-wrap:wrap;border-top:1px solid #365043;padding-top:12px;margin-top:-9px}
+#placement-controls .furniture-choices{display:flex;gap:7px;margin:0}
+#placement-controls .furniture-choices button{min-height:32px;font-size:11px;padding:6px 12px;flex:initial}
+.placement-demo-price{font-size:11px;color:#e7f1e8;white-space:nowrap}
+#placement-controls .placement-shop-note{grid-column:auto;margin:0 0 0 auto;color:#8fa698;max-width:450px}
+@media(max-width:760px){#placement-controls .placement-extra{grid-column:1;align-items:flex-start;gap:10px;margin:0}.placement-demo-price{align-self:center}.placement-shop-note{margin:0!important;max-width:none!important}}
+/* Keep the provider's in-view attribution and controls unobstructed. */
+#placement-stage .placement-badge,#placement-stage .placement-help{display:none}
